@@ -1,0 +1,121 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.PurchaseOrder
+
+@{
+    ViewBag.Title = "PurchaseOrder";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<style>
+
+    table#GridPurchseOredeDetails tr td:nth-child(4) {
+        text-align: right !important
+    }
+</style>
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Purchase Order For Security Hologram </span>
+                <button type="button" class="btn btn-success pull-right" id="btnnew" data-translate="Create">
+                    <i class="fa fa-plus"></i> Create
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="container-fluid">
+        <table id="GridPurchseOredeDetails" style="width:100%!important" class="table dispaly table-bordered dataTable no-footer">
+            <thead>
+                <tr style="text-align: center;">
+                    <th style="text-align: center;" class="green" data-translate="Serial.No">Serial.No</th>
+                    <th style="text-align: center;" class="green" data-translate="Shop Id">Purchase OrderId</th>
+                    <th style="text-align: center;" class="green" data-translate="Shop Id">Purchase Number</th>
+                    <th style="text-align: center;" class="green" data-translate="Shop Code">Purchase Date</th>
+                    <th style="text-align: center;" class="green" data-translate="Shop Name">Supplier</th>
+                    <th style="text-align: center;" class="green" data-translate="Deo Name">Request Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Deo Id">Status</th>
+                    <th style="text-align: center;" class="green" data-translate="Circle Name">Action</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#btnnew').click(function () {
+            var url = '@Url.Action("PurchaseOrderCreation", "PurchaseOrder")';
+            window.location.href = url;
+        });
+        $('#GridPurchseOredeDetails').DataTable({
+            "aaSorting": [[0, "desc"]],
+            "ajax": {
+                "url": "../PurchaseOrder/GetAllPurchaseOrderDetails",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": null, "defaultContent": "", "orderable": true, "class": "dt-center" },
+                { "data": 'HologramPurchaseOrderId', "autoWidth": true, "visible": false },
+                { "data": 'PurchaseOrderNumber', "autoWidth": true },
+                {
+                    "data": 'PurchaseOrderDate', "autoWidth": true,
+                    render: function (data) {
+                        // Format date using moment.js
+                        return moment(data).format('DD-MMM-yy');
+                    }    },
+                { "data": 'Supplier', "autoWidth": true },
+                {
+                    "data": 'RequestQuantity',
+                    "autoWidth": true,
+                    "render": function (data, type, row) {
+                        if (type === 'display' && typeof data === 'number') {
+                            return data.toLocaleString(); // Format with commas
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "data": "Status", "autoWidth": true, "sortable": true, "render": function (data, type, row) {
+                        if (row.Status == 0) {
+                            return '<label for="Submitted" class="control-label"><b>Submitted</b></label>';
+                        }
+                        else {
+                            return '<label for="Pending" class="control-label"><b>Printing Request Pending</b></label>';
+                        }
+                    }
+                },
+                {
+                    "data": "View", "autoWidth": true, "sortable": true, "render": function (data, type, row) {
+                        return '<a title="Click here to Edit" href="javascript:EditClick(\'' + row.HologramPurchaseOrderId + '\', \'V\')"><i class="fa fa-eye" style="font-size: 16px"></i></a>';
+                    }
+                }
+            ],
+            "columnDefs": [
+                {
+                    "targets": 0, // Target the first column (Serial Number)
+                    "data": null,
+                    "render": function (data, type, row, meta) {
+                        // Use meta.row to get the current row index and add 1 to start from 1
+                        return meta.row + 1;
+                    }
+                }
+            ]
+        });
+
+    });
+    function EditClick(HologramPurchaseOrderId) {
+        window.location.href = "../PurchaseOrder/EditViewPurchaseOrder?PurchaseOrderId=" + HologramPurchaseOrderId;
+    }
+
+</script>
+

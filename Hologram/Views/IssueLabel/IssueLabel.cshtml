@@ -1,0 +1,302 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model IEMS_WEB.Areas.Hologram.Models.RequestModel.IssueLabel
+@{
+    ViewBag.Title = "IssueLabel";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Issue Hologram To Department</span>
+                <button type="button" class="btn btn-primary pull-right" id="btnBack" data-translate="Back">
+                    <i class="fa fa-plus"></i> Back
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+<style>
+    table.dataTable input {
+        height: auto !important;
+    }
+
+    table#myTable tr td:nth-child(1) {
+        width: 15% !important
+    }
+</style>
+@using (Html.BeginForm())
+{
+    <div class="row">
+        <div class="col-md-3">
+            <label for="Issue Date" class="control-label mandatory" data-translate="Issue Date">
+                Issue Date
+            </label>
+            @Html.TextBoxFor(m => m.issueDate, new
+        {
+        @maxlength = "13",
+        @class = "form-control issuedateformat",
+        autocomplete = "off",
+        id = "txtIssueDate",
+        placeholder = "DD-MM-YYYY",
+        Readonly = "true"
+        })
+        </div>
+      
+        <div class="col-md-3 form-group" id="hideIssueNumber">
+            <label for="Issue Number" class="control-label mandatory" data-translate="Issue Number">
+                Issue Number
+            </label>
+            @Html.TextBoxFor(m => m.issueNumber, new
+        {
+        @maxlength = "13",
+        @class = "form-control",
+        autocomplete = "off",
+        id = "txtIssuenum",
+        Readonly = "true",
+        placeholder = "(Auto Generated)"
+        })
+        </div>
+      
+    </div>
+
+    <table id="myTable" class="table display table-bordered dataTable no-footer dtr-inline.">
+        <tr>
+            <th data-translate="slno">SL NO</th>
+            <th data-translate="box">BOX NUMBER</th>
+            <th class="actionHead" data-translate="Action">ACTION</th>
+        </tr>
+        @for (var i = 0; i < Model.issueLabelDetails.Count(); i++)
+        {
+            <tr class="data-row">
+                <td>
+                    @Html.TextBoxFor(model => model.issueLabelDetails[i].Slno, new
+            {
+            @class = "slno form-control numbers",
+            @style = "text-align:right!important",
+            id = "txtslno",
+            @onkeypress = "return numbersonly(event,this)",
+            @maxlength = "10",
+            @value = "1"
+            })
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.issueLabelDetails[i].CaseNumber, new
+            {
+            @class = "BoxNumber form-control numbers",
+            @style = "text-align:right!important",
+            id = "txtBoxNumber",
+            @maxlength = "14",
+            autocomplete = "off",
+            placeholder = "Scan Box Number"
+
+            })
+                </td>
+                <td class="actionData">
+                    @if (i == 0)
+                    {
+                        <i class="fa fa-plus" id="txtAdd" value="Add" style="color:green!important" onclick="toggleAddRemove(this)"></i>
+                    }
+                    else
+                    {
+                        <i class="fa fa-minus" style="color:red!important" onclick="toggleAddRemove(this)"></i>
+
+                    }
+                </td>
+            </tr>
+        }
+    </table>
+    <br />
+    <div class="text-center">
+        <button type="button" id="btnSave" class="btn btn-success" data-translate="Save">Save</button>
+        @*<button type="submit" id="btnSubmit" class="btn btn-secondary" data-translate="Submit">Submit</button>*@
+        <button type="button" id="btnCancel" class="btn btn-danger" data-translate="Cancel">Cancel</button>
+    </div>
+}
+@if (Model.ResponseCode >= 200 && Model.ResponseCode <= 299)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Issue Details has been Saved Successfully",
+                type: "Success"
+            }).then(function () {
+                var url = '@Url.Action("IssueLabelView", "IssueLabel")';
+                window.location.href = url;
+            });
+        });
+    </script>
+}
+@if (Model.ResponseCode >= 400 && Model.ResponseCode <= 499)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Something Went Wrong:404",
+                type: "error"
+            }).then(function () {
+                var url = '@Url.Action("IssueLabelView", "IssueLabel")';
+                window.location.href = url;
+            });
+        });
+    </script>
+}
+<script type="text/javascript">
+  
+    $(document).ready(function () {
+        if ($('#txtIssuenum').val() != "") {
+            debugger;
+            $('#btnSave').hide();
+            $('#btnCancel').hide();
+            $('.slno').prop("readonly", true);
+            $('.BoxNumber').prop("readonly", true);
+            $('.actionData').hide();
+            $('.actionHead').hide();
+            $('#hideIssueNumber').show();
+            var issueDate = $('#txtIssueDate').val();
+            var dateWithoutTime = issueDate.split(' ')[0];
+            var formattingDate = formatDate(dateWithoutTime);
+            $('#txtIssueDate').val(formattingDate);
+        }
+        else {
+            debugger;
+            $('#btnSave').show();
+            $('#btnCancel').show();
+            $('.slno').prop("readonly", true);
+            $('.BoxNumber').prop("readonly", false);
+            $('.actionData').show();
+            $('.actionHead').show();
+            $('#hideIssueNumber').hide();
+            $("#txtIssueDate").datepicker({
+                dateFormat: "dd-M-yy",
+                maxDate: 0,
+                changeMonth: true,
+                changeYear: true,
+                defaultDate: new Date(),
+                onSelect: function (evnt) {
+                    $(this).tooltip("dispose");
+                }
+            });
+            $("#txtIssueDate").datepicker("setDate", new Date());
+
+        }
+
+        $("#btnBack").click(function () {
+            var url = '@Url.Action("IssueLabelView", "IssueLabel")';
+            window.location.href = url;
+        });
+        $('#btnCancel').click(function () {
+            window.location.reload();
+        });
+
+        $('#btnSave').click(function (event) {
+            var itemsData = {};
+            var itemData = "";
+            var hasEmptyBoxNumber = false;
+
+            $("#myTable tr.data-row").each(function (index, row) {
+                var slno = $(row).find(".slno").val();
+                var boxnumber = $(row).find(".BoxNumber").val();
+
+                if (boxnumber.trim() === "") {
+                    Swal.fire({
+                        text: "Please scan Boxnumber at Row " + (index + 1),
+                        type: "warning",
+                    }).then(function () {
+                        // Optionally, you can focus on the empty Box Number input for the user's convenience.
+                        // $(row).find(".BoxNumber").focus();
+                    });
+
+                    hasEmptyBoxNumber = true; 
+                    return false;
+                } else {
+                    itemsData.SlNo = slno;
+                    itemsData.CaseNumber = boxnumber;
+                    itemData += JSON.stringify(itemsData) + ",";
+                }
+            });
+
+            if (hasEmptyBoxNumber) {
+                event.preventDefault();
+                return false;
+            }
+
+            var jsonData = JSON.stringify(itemData);
+            var date = $("#txtIssueDate").val();
+            var Issuenum = 0;
+
+            $.ajax({
+                type: "POST",
+                url: "../IssueLabel/SaveIssueLabelDetails",
+                dataType: "json",
+                data: { jsondata: itemData, dateval: date, issno: Issuenum },
+
+                success: function (data) {
+                    debugger;
+                    if (data.ResponseCode >= 200 && data.ResponseCode <= 300) {
+                        swal({
+                            title: '',
+                            text: 'Issue Label Save Successfully With Issue Number ' + data.issueNumber,
+                            type: "success"
+                        }).then(function () {
+                            window.location = "../IssueLabel/IssueLabelView";
+                            var url = '@Url.Action("IssueLabelView", "IssueLabel")';
+                            window.location.href = url;
+                        });
+                    } else {
+                        swal({
+                            title: '',
+                            text: "Something Went Wrong....",
+                            type: "success"
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+    function toggleAddRemove(button) {
+        var dataRow = $(button).closest('.data-row');
+
+        if ($(button).hasClass('fa-plus')) {
+
+            $(button).removeClass('fa-plus').addClass('fa-minus');
+            var newRow = dataRow.clone().addClass('cloned-row');
+            var newSerialNumber = parseInt(newRow.find('.slno').val()) + 1;
+            newRow.find('input').val('');
+            newRow.find('textarea').val('');
+            newRow.find('i.fa-minus').removeClass('fa-minus').addClass('fa-plus');
+            dataRow.after(newRow);
+            updateSerialNumbers();
+        } else {
+            dataRow.remove();
+            updateSerialNumbers();
+        }
+    }
+
+    function updateSerialNumbers() {
+        $('.data-row').each(function (index) {
+            $(this).find('.slno').val(index + 1);
+        });
+    }
+    function formatDate(dateString) {
+        debugger;
+        var parts = dateString.split('-');
+        var day = parseInt(parts[0], 10);
+        var month = parseInt(parts[1], 10) - 1;
+        var year = parseInt(parts[2], 10);
+
+        var formattedDate = new Date(year, month, day);
+        var options = { day: '2-digit', month: 'short', year: 'numeric' };
+        return formattedDate.toLocaleDateString('en-IN', options).toUpperCase();
+    }
+</script>

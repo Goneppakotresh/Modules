@@ -1,0 +1,374 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.PrintingRequest
+@{
+    ViewBag.Title = "PrintingRequestCreation";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+
+                <span>QR Code Print Request Entry </span>
+                <button type="button" class="btn btn-primary pull-right" id="btnBack" data-translate="Back">
+                    <i class="fa fa-plus"></i> Back
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="row">
+        <div class="col-md-3 form-group">
+            <label data-translate="">Purchase Order Number<span style="color:red">*</span></label>
+            @Html.HiddenFor(model => model.HologramPrintingRequestId, new { id = "txtHologramPrintingRequestId" })
+            @Html.DropDownListFor(m => m.HologramPurchaseOrderId, ViewBag.PurchaseOrderList as List<SelectListItem>, "Select", new
+        {
+        @class = "form-control js-example-basic-single",
+        id = "ddlPonum",
+        onchange = "GetPODetails()"
+        })
+            @Html.ValidationMessageFor(m => m.HologramPurchaseOrderId, "", new { @class = "text-danger", id = "dspPoNo" })
+        </div>
+        <div class="col-md-3 form-group">
+            <label for="To Date" class="control-label mandatory" data-translate="">
+                Purchase Order Request Date  <span class="air_mandatory" style="color: red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.PurchaseRequestDate, new
+        {
+        @maxlength = "12",
+        @class = "form-control datepicker",
+        autocomplete = "off",
+        id = "txtPoRequestDate",
+        placeholder = "DD-MM-YYYY",
+        Readonly = true
+        })
+            @Html.ValidationMessageFor(m => m.PurchaseRequestDate, "", new { @class = "text-danger", id = "dspRequestDate" })
+        </div>
+        <div class="col-md-3 form-group ">
+            <label for="Supplier" class="control-label mandatory" data-translate="">
+                Purchase Order Request Quantity <span class="air_mandatory" style="color: red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.PurchaseOrderRequestQuantity, new
+        {
+        @maxlength = "100",
+        @class = "form-control numbers",
+        autocomplete = "off",
+        id = "txtPoRequestQty",
+        Readonly = "true"
+        })
+            @Html.ValidationMessageFor(m => m.PurchaseOrderRequestQuantity, "", new { @class = "text-danger", id = "dspRequestQty" })
+        </div>
+        <div class="col-md-3 form-group">
+            <label for="RequestDate" class="control-label" data-translate="RequestDate">
+                Request Date
+                <span class="air_mandatory" style="color: red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.RequestDate, new
+        {
+        @maxlength = "12",
+        @class = "form-control",
+        autocomplete = "off",
+        id = "txtRequestdate",
+        @readonly = "readonly"
+        })
+        </div>
+
+
+        <div class="col-md-3 form-group divRequestNumber" >
+            <label for="Request Number" class="control-label" data-translate="RequestNumber">
+                Request Number
+                <span class="air_mandatory" style="color: red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.RequestNumber, new
+        {
+        @maxlength = "12",
+        @class = "form-control",
+        autocomplete = "off",
+        id = "txtReqNumber",
+        Readonly = true,
+        @placeholder = "(Auto Generated)"
+        })
+        </div>
+        <div class="col-md-3 form-group">
+            <label for="boxes" class="control-label mandatory" data-translate="boxes">
+                No. Of Boxes
+                <span class="air_mandatory" style="color: red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.BoxQuantity, new
+        {
+        @maxlength = "12",
+        @class = "form-control numbers",
+        autocomplete = "off",
+        id = "txtBoxes"
+        })
+            @Html.ValidationMessageFor(model => model.BoxQuantity, "", new { @class = "text-danger validation-message", id = "txtvalBoxes" })
+
+        </div>
+        <div class="col-md-3 form-group">
+            <label for="boxes" class="control-label" data-translate="boxes">
+                Label Quantity
+                <span class="air_mandatory" style="color: red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.RequestQuantity, new
+        {
+        @maxlength = "15",
+        @class = "form-control",
+        autocomplete = "off",
+        id = "txtLabel",
+        Readonly = true
+        })
+        </div>
+
+        <div class="col-md-3 form-group">
+            <label for="boxes" class="control-label" data-translate="boxes">
+                Requested Balance
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.Balance, new
+        {
+        @maxlength = "15",
+        @class = "form-control",
+        autocomplete = "off",
+        id = "textBalance",
+        Readonly = true
+        })
+        </div>
+
+        <div class="col-md-3 form-group">
+            <label for="boxes" class="control-label" data-translate="boxes">
+                Remarks
+                <span class="air_mandatory" style="color: red">*</span>
+            </label>
+            @Html.TextAreaFor(m => m.Remark, new
+        {
+        @maxlength = "15",
+        @class = "form-control",
+        autocomplete = "off",
+        id = "txtRemark",
+        resize = "none",
+        placeholder = "Enter Remarks",
+        oninput="this.value = this.value.replace(/^\\s+/, '').replace(/[^a-zA-Z]+/g, ' ');"
+
+        })
+            @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger validation-message", id = "txtvalremark" })
+        </div>
+    </div>
+    <div class="text-center">
+        <button type="submit" id="btnSave" class="btn btn-success" data-translate="Save">Save</button>
+        <button type="button" id="btnReset" class="btn btn-danger" data-translate="Cancel">Reset</button>
+        <button type="button" id="printhologramid" class="btn btn-primary" data-translate="">Print Hologram</button>
+    </div>
+    
+}
+@if (Model.responses.Status >= 200 && Model.responses.Status <= 299)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Printing Request has been Saved Successfully with Request No. " + '@Model.responses.RequestNumber',
+                type: "Success"
+            }).then(function () {
+                var url = '@Url.Action("PrintingRequest", "PrintingRequest")';
+                window.location.href = url;
+            });
+        });
+    </script>
+}
+@if (Model.responses.Status >= 400 && Model.responses.Status <= 499)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Something Went Wrong :404",
+                type: "error"
+            }).then(function () {
+                var url = '@Url.Action("PrintingRequest", "PrintingRequest")';
+                window.location.href = url;
+            });
+        });
+    </script>
+}
+<script type="text/javascript">
+    $('#printhologramid').click(function () {
+        window.location.href = "../IndentRequests/PrintingRequestDetails?hologramPurchaseOrderId=" + @Model.HologramPrintingRequestId;
+    });
+    $(document).ready(function () {
+        var noofbox = $('#txtBoxes').val();
+        if (noofbox == "0" || txtBoxes == "") {
+
+        }
+        $('#btnSave').click(function () {
+            debugger;
+            $('#txtLabel').val($('#txtLabel').val().replace(/[,/]/g, ""))
+            var ddlPo = $('#ddlPonum').val();
+            var boxnumber = $('#txtBoxes').val();
+            var remark = $('txtRemark').text();
+            var printqty = $('#txtLabel').val();
+            var poqty = $('#txtPoRequestQty').val();
+            var requestBalance = parseInt($('#textBalance').val());
+            printqty = parseInt(printqty);
+            poqty = parseInt(poqty);
+            if (printqty > poqty) {
+                alert('Please, Enter Less than po quantity');
+                return false;
+            }
+            if (ddlPo == "0" || ddlPo == "") {
+                $('#dspPoNo').html("Please select Purchase Order Number");
+                $('#ddlPonum').focus();
+                return false;
+            } else {
+                $('#dspPoNo').html("");
+            }
+            if (!boxnumber) {
+                $('#txtvalBoxes').html("Please Enter No.Of Boxes");
+                $('#txtBoxes').focus();
+                return false;
+            } else {
+                $('#txtBoxes').html("");
+            }
+            // if (remark == "0" || remark=="") {
+            //     $('#txtvalremark').html("Please Enter the Remark");
+            //     $('#txtRemark').focus();
+            //     return false;
+            // } else {
+            //     $('#txtRemark').html("");
+            // }
+
+            if (requestBalance == "0" || requestBalance == "") {
+                var selectedPoNumber = $("#ddlPonum option:selected").text();
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Balance is Low for Purchase Order Number: " + selectedPoNumber,
+                });
+
+                return false;
+            }
+        });
+    });
+    $("#btnBack").click(function () {
+        var url = '@Url.Action("PrintingRequest", "PrintingRequest")';
+        window.location.href = url;
+        // window.location.href = "../PrintingRequest/PrintingRequest";
+    });
+    $("#btnReset").click(function () {
+        var url = '@Url.Action("PrintingRequestCreation", "PrintingRequest")';
+        window.location.href = url;
+        // window.location.href = "../PrintingRequest/PrintingRequestCreation";
+    });
+    $("#txtRequestdate").datepicker({
+        dateFormat: "dd-M-yy",
+        maxDate: 0,
+        changeMonth: true,
+        changeYear: true,
+        defaultDate: new Date(),
+        onSelect: function (evnt) {
+            $(this).tooltip("dispose");
+        }
+    });
+    $("#txtRequestdate").datepicker("setDate", new Date());
+    $(document).ready(function () {
+        $('#txtBoxes').on('input', function () {
+            var noOfboxes = parseInt($(this).val()) || 0; // Use $(this).val() to get the value
+            if (noOfboxes == "") {
+                noOfboxes = 0;
+            }
+            var formattedQty = noOfboxes * 3 * 20000;
+            var formattedQtyString = formattedQty.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            $('#txtLabel').val(formattedQtyString);
+        });
+    });
+    debugger;
+    var printreqid = $('#txtHologramPrintingRequestId').val();
+    if (printreqid > 0) {
+        debugger;
+        $("#btnSave").hide();
+        $("#btnReset").hide();
+        $("#ddlPonum").attr("disabled", true);
+        $("#txtRequestdate").attr("disabled", true);
+        $("#txtBoxes").prop("disabled", true);
+        $("#txtRemark").prop("disabled", true);
+        $('.divRequestNumber').show();
+        if (@Model.Status== 0) { 
+        $('#printhologramid').show();
+        }
+        else{
+            $('#printhologramid').hide();
+            $("#txtPoRequestDate").prop("disabled", true);
+        }
+        $('#ddlPonum').trigger('change');
+        var Requestdate = $('#txtRequestdate').val();
+        var dateWithoutTime = purchaseDate.split(' ')[0];
+        var formattedDate = formatDate(dateWithoutTime);
+        $('#txtRequestdate').val(formattedDate);
+        sessionStorage.removeItem("ref");
+    }
+
+    if (printreqid == 0) {
+        debugger
+        $("#btnSave").show();
+        $("#btnReset").show();
+        $("#printhologramid").hide();
+        $("#ddlPonum").attr("disabled", false);
+        $("#txtRequestdate").attr("disabled", false);
+        $("#txtBoxes").prop("disabled", false);
+        $("#txtRemark").prop("disabled", false);
+        $('.divRequestNumber').hide();
+        $("#txtPoRequestDate").prop("disabled", true);
+        sessionStorage.removeItem("RefrenceId");
+    }
+
+    function GetPODetails() {
+        debugger;
+        var purchaseOrderId = $("#ddlPonum").val();
+        $.ajax({
+            type: "GET",
+            url: "../ReceiveHologramDispatch/GetPurchaseOrderDetails",
+            data: { "purchaseOrderId": purchaseOrderId },
+            async: false,
+            dataType: 'json',
+            success: function (data) {
+                debugger
+                if (data) {
+                    $('#txtPoRequestQty').val(data.RequestQuantity);
+                    var formattedDate = formatDate(data.PurchaseOrderDate);
+                    $('#txtPoRequestDate').val(formattedDate);
+                }
+            }
+        });
+
+        $.ajax({
+            url: "../PrintingRequest/GetRequestedBalance",
+            dataType: 'json',
+            data: { hologramPurchaseOrderId: purchaseOrderId },
+            success: function (data) {
+                debugger;
+                var fetchedData = data.data;
+                if (fetchedData.hasOwnProperty('Balance')) {
+                    $('#textBalance').val(fetchedData.Balance);
+                   
+                } else {
+                    console.error("'Balance' not found in the fetched data.");
+                }
+            },
+            error: function () {
+                console.error("Error fetching data from the API.");
+            }
+        });
+    }
+
+ 
+    function formatDate(dateString) {
+        var options = { day: '2-digit', month: 'short', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-IN', options).toUpperCase();
+    }
+
+
+
+</script>

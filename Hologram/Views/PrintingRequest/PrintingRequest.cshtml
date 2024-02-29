@@ -1,0 +1,155 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.ResponseModel.PrintingRequestResponse
+@{
+    ViewBag.Title = "PrintingRequest";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<style>
+    table#GridPrintRequestListDetails tr td:nth-child(4) {
+        text-align: right !important
+    }
+
+    table#GridPrintRequestListDetails tr td:nth-child(3) {
+        text-align: right !important
+    }
+
+    table#GridPrintRequestListDetails tr td:nth-child(2) {
+        text-align: right !important
+    }
+</style>
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Hologram Print Request List </span>
+                <button type="button" class="btn btn-success pull-right" id="btnnew" data-translate="Create">
+                    <i class="fa fa-plus"></i> New
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="container-fluid">
+        <table id="GridPrintRequestListDetails" style="width:100%!important" class="table dispaly table-bordered dataTable no-footer">
+            <thead>
+                <tr style="text-align: center;">
+                    <th style="text-align: center;" class="green" data-translate="Shop Code">Serial.No</th>
+                    <th style="text-align: center;" class="green" data-translate="Shop Code">Purchase Order Number</th>
+                    <th style="text-align: center;" class="green" data-translate="Shop Code">Request Date</th>
+                    <th style="text-align: center;" class="green" data-translate="Shop Code">Purchase Order Request Quantity </th>
+                    <th style="text-align: center;" class="green" data-translate="Shop Name">Request No</th>
+                    <th style="text-align: center;" class="green" data-translate="Deo Name">No of Boxes</th>
+                    <th style="text-align: center;" class="green" data-translate="Deo Id">Label Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Deo Id">Status</th>
+                    <th style="text-align: center;" class="green" data-translate="Circle Name">View Details</th>
+                    <th style="text-align: center;" class="green" data-translate="Circle Name">Edit</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+}
+<script type="text/javascript">
+    $("#btnnew").click(function () {
+        // window.location.href = "../PrintingRequest/PrintingRequestCreation";
+        var url = '@Url.Action("PrintingRequestCreation", "PrintingRequest")';
+        window.location.href = url;
+    });
+
+    $(document).ready(function () {
+
+        $('#GridPrintRequestListDetails').DataTable({
+            "ajax": {
+                "url": "../PrintingRequest/GetAllPrintingRequestListDetails",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": null, "defaultContent": "", "orderable": true, "class": "dt-center" },
+                { "data": 'HologramPrintingRequestId', "autoWidth": true,"visible":false },
+                {
+                    "data": 'RequestDate', "autoWidth": true, render: function (data) {
+                        // Format date using moment.js
+                        return moment(data).format('DD-MMM-yy');
+                    } },
+                { "data": 'PurchaseOrderRequestQuantity', "autoWidth": true , "visible":false},
+                { "data": 'RequestNumber', "autoWidth": true },
+                { "data": 'BoxQuantity', "autoWidth": true },
+                { "data": 'RequestQuantity', "autoWidth": true },
+                {
+                    "data": "Status", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        if (row.Status == 0) {
+                            return '<label for="Submitted" class="control-label"><b>Submitted</b></label>';
+                        }
+                        else {
+                            return '<label for="Pending" class="control-label"><b>Printing Request Pending</b></label>';
+                        }
+                    }
+                },
+                {
+                    "data": "HologramPrintingRequestId", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        return '<a title="Click here to View" href="javascript:ViewClick(\'' + row.HologramPrintingRequestId + '\', \'V\')"><i class="fa fa-eye" style="font-size: 16px"></i></a>';
+                    }
+                },
+                {
+                    "data": "HologramPrintingRequestId", "autoWidth": true, "sortable": false, "visible": false, "render": function (data, type, row) {
+                        return '<a title="Click here to Edit" href="javascript:EditClick(\'' + row.HologramPrintingRequestId + '\', \'V\')"><i class="fa fa-edit" style="font-size: 16px"></i></a>';
+                    }
+                },
+            ],
+            "columnDefs": [
+                {
+                    "targets": 0, // Target the first column (Serial Number)
+                    "data": null,
+                    "render": function (data, type, row, meta) {
+                        // Use meta.row to get the current row index and add 1 to start from 1
+                        return meta.row + 1;
+                    }
+                }
+            ]
+        });
+
+    });
+
+ //    function ViewClick(HologramPrintingRequestId) {
+
+ // $.ajax({
+ //  url: '@Url.Action("PrintingRequestById", "PrintingRequest")',
+ //  type: 'GET',
+ //     data: { id: HologramPrintingRequestId },
+ //  dataType: 'json',
+ //     success: function (data) {
+ //         sessionStorage.setItem('ref', 1);
+ //         document.location.href = "../PrintingRequest/PrintingRequestCreation";
+ //  },
+ //  error: function () {
+
+ //     }
+ //  });
+ //    }
+
+    function EditClick(HologramPrintingRequestId) {
+
+ $.ajax({
+  url: '@Url.Action("PrintingRequestById", "PrintingRequest")',
+  type: 'GET',
+     data: { id: HologramPrintingRequestId },
+  dataType: 'json',
+     success: function (data) {
+         sessionStorage.setItem('RefrenceId', -1);
+         document.location.href = "../PrintingRequest/PrintingRequestCreation";
+  },
+  error: function () {
+
+     }
+  });
+}
+    function ViewClick(HologramPrintingRequestId) {
+        window.location.href = "../PrintingRequest/PrintingRequestById?id=" + HologramPrintingRequestId;
+    }
+</script>
+

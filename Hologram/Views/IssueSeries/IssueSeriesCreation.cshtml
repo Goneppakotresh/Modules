@@ -1,0 +1,266 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.IssueSeries
+@{
+    ViewBag.Title = "IssueSeriesCreation";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Issue Of Hologram Series </span>
+                <button type="button" class="btn btn-primary pull-right" id="btnBack" data-translate="Back">
+                    <i class="fa fa-plus"></i> Back
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    @Html.HiddenFor(m=>m.PrintingRequestId,new {id="hdnPrintReqId"})
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label data-translate="">Po No.<span style="color:red">*</span></label>
+                @Html.DropDownListFor(m => m.PurchaseOrderId, ViewBag.PurchaseOrderList as List<SelectListItem>, new
+           {
+               @class = "form-control js-example-basic-single",
+               id = "ddlPonum",
+               onchange = "GetPODetails()",
+               disabled = true
+           })
+                @Html.ValidationMessageFor(m => m.PurchaseOrderId, "", new { @class = "text-danger", id = "dspPoNo" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label for="To Date" class="control-label mandatory" data-translate="">
+                Po Request Date
+            </label>
+            @Html.TextBoxFor(m => m.PurchaseOrderDate, new
+       {
+           @maxlength = "12",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtPoRequestDate",
+           placeholder = "DD-MM-YYYY",
+           Readonly = true
+       })
+            @Html.ValidationMessageFor(m => m.PurchaseOrderDate, "", new { @class = "text-danger", id = "dspRequestDate" })
+        </div>
+        <div class="col-md-3 form-group">
+            <label for="Supplier" class="control-label mandatory" data-translate="">
+                Po Request Qty
+            </label>
+            @Html.TextBoxFor(m => m.PurchaseOrderQuantity, new
+       {
+           @maxlength = "100",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtPoRequestQty",
+           Readonly = "true"
+       })
+            @Html.ValidationMessageFor(m => m.PurchaseOrderQuantity, "", new { @class = "text-danger", id = "dspRequestQty" })
+        </div>
+        <div class="col-md-3">
+            <label for="RequestDate" class="control-label" data-translate="RequestDate">
+                Print Request Date
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.PrintRequestDate, new
+       {
+           @maxlength = "12",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtRequestdate",
+           @readonly = "readonly"
+       })
+            @Html.ValidationMessageFor(m => m.PrintRequestDate, "", new { @class = "text-danger", id = "dspRequestQty" })
+        </div>
+    </div>
+    <div class="row">
+     
+        <div class="col-md-3">
+            <label for="Request Number" class="control-label" data-translate="RequestNumber">
+                Print Request Number
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.PrintRequestNumber, new
+       {
+           @maxlength = "12",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtReqNumber",
+           Readonly = true,
+       })
+            @Html.ValidationMessageFor(m => m.PrintRequestNumber, "", new { @class = "text-danger", id = "dspRequestQty" })
+        </div>
+        <div class="col-md-3">
+            <label for="boxes" class="control-label mandatory" data-translate="boxes">
+                Print Request Quantity
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.PrintingRequestQuantity, new
+       {
+           @maxlength = "12",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtBoxes",
+           Readonly = true
+       })
+            @Html.ValidationMessageFor(model => model.PrintingRequestQuantity, "", new { @class = "text-danger validation-message", id = "txtBoxes" })
+
+        </div>
+        <div class="col-md-3">
+            <label for="boxes" class="control-label mandatory" data-translate="boxes">
+                From Series Number
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.FromSeriesNumber, new
+       {
+           @maxlength = "50",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtFromSeriesNumber",
+        @readonly = "readonly"
+       })
+            @Html.ValidationMessageFor(model => model.FromSeriesNumber, "", new { @class = "text-danger validation-message", id = "txtBoxes" })
+
+        </div>
+        <div class="col-md-3">
+            <label for="boxes" class="control-label mandatory" data-translate="boxes">
+                To Series Number
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.ToSeriesNumber, new
+       {
+           @maxlength = "50",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtToSeriesNumber",
+        @readonly = "readonly"
+       })
+            @Html.ValidationMessageFor(model => model.PrintingRequestQuantity, "", new { @class = "text-danger validation-message", id = "txtBoxes" })
+
+        </div>
+
+    </div>
+    <br />
+    <br />
+    <div class="text-center" id="btnDetails">
+        <button type="submit" id="btnSave" class="btn btn-success" data-translate="Save">Allocate</button>
+        <button type="button" id="btnReset" class="btn btn-danger" data-translate="Cancel">Cancel</button>
+    </div>
+}
+@if (Model.responses.ResponseCode >= 200&& Model.responses.ResponseCode <= 299)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Series has been allocated successfully",
+                type: "Success"
+            }).then(function () {
+                window.location.href = "../IssueSeries/IssueSeries";
+            });
+        });
+    </script>
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        GetPODetails();
+        fetchDataFromApi();
+
+        var noofbox = $('#txtBoxes').val();
+        if (noOfBoxes == "0" || txtBoxes == "") {
+
+        }
+    });
+    $("#btnBack").click(function () {
+        window.location.href = "../IssueSeries/IssueSeries";
+    });
+    $("#btnReset").click(function () {
+        window.location.href = "../IssueSeries/IssueSeriesCreation";
+    });
+    $("#txtRequestdate").datepicker({
+        dateFormat: "dd-M-yy",
+        maxDate: 0,
+        changeMonth: true,
+        changeYear: true,
+        defaultDate: new Date(),
+        onSelect: function (evnt) {
+            $(this).tooltip("dispose");
+        }
+    });
+    $("#txtRequestdate").datepicker("setDate", new Date());
+    $(document).ready(function () {
+
+        $('#txtBoxes').change(function () {
+            debugger;
+            var noOfBoxes = $('#txtBoxes').val();
+            var fromSeriesNo = $('#txtFromSeriesNumber').val();
+            $('#txtLabel').val(parseInt(noOfBoxes) * 3 * 20000);
+            $('#txtToSeriesNumber').val(parseInt(fromSeriesNo) + parseInt(parseInt(noOfBoxes)));
+
+
+        });
+
+    });
+    function GetPODetails() {
+        var purchaseOrderId = $("#ddlPonum").val();
+        $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: "../ReceiveHologramDispatch/GetPurchaseOrderDetails",
+            data: { "purchaseOrderId": purchaseOrderId },
+
+            async: false,
+            dataType: 'json',
+            success: function (data) {
+                debugger
+                if (data) {
+                    $('#txtPoRequestQty').val(data.RequestQuantity);
+                    $('#txtPoRequestDate').val(data.PurchaseOrderDate);
+                }
+            }
+        });
+    }
+
+    function fetchDataFromApi() {
+        $.ajax({
+            url: "../IssueSeries/GetFromSeriesNo",
+            dataType: 'json',
+            success: function (data) {             
+                var fetchedData = data.data;
+                if (fetchedData.hasOwnProperty('FromSeriesNumber')) {
+                    $('#txtFromSeriesNumber').val(fetchedData.FromSeriesNumber);
+
+                    updateToSeriesNumber();
+                } else {
+                    console.error("Property 'FromSeriesNumber' not found in the fetched data.");
+                }
+            },
+            error: function () {               
+                console.error("Error fetching data from the API.");
+            }
+        });
+    }
+    function updateToSeriesNumber() {
+        debugger;
+        // Get values from the other textboxes
+        var printingRequestQuantity = parseFloat($('#txtBoxes').val()) || 0;
+        var fromSeriesNumber = parseFloat($('#txtFromSeriesNumber').val()) || 0;
+
+        // Calculate the sum
+        var toSeriesNumber = printingRequestQuantity + fromSeriesNumber;
+
+        // Update the value of "To Series Number" textbox
+        $('#txtToSeriesNumber').val(toSeriesNumber);
+       
+    }
+</script>
+
+

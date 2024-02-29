@@ -1,0 +1,595 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.ProductionDispatch
+@{
+    ViewBag.Title = "ProductionDispatchView";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    table.dataTable input {
+        height: auto !important
+    }
+</style>
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Production Dispatch </span>
+                <button type="button" class="btn btn-primary pull-right" id="btnBack" data-translate="Back">
+                    <i class="fa fa-plus"></i> Back
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm())
+{
+    <!-- Modal for displaying Budget details -->
+    <div id="modalbox" class="modal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h5 class="modal-title" id="ExciseFeeModalLabel" data-translate="ExciseFee Details">Box Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+
+
+                        <label for="hologramNumber" class="control-label" data-translate="hologramNumber">
+                            Case No : <span id="lblCaseNo"></span>
+                        </label>
+                        <table class="table dispaly table-bordered dataTable no-footer" style="width:100%!important">
+                            <thead>
+                                <tr>
+                                    <th>Scan Roll</th>
+                                    <th>First Hologram No</th>
+                                    <th>Spool Number</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{int j = 0;}
+                                @foreach (var itm in Model.SpoolCaseMappingandDetails)
+                                {
+                                    <tr>
+                                        <td>@(j+1)</td>
+                                        <td>
+                                            <div class="col-xl-12">
+                                                <input class="form-control" type="text" name="Modal_SpoolCaseMappingandDetails[@j].SpoolFirstNumber" value="@Model.SpoolCaseMappingandDetails[@j].SpoolFirstNumber" />
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="col-xl-12">
+                                                <input class="form-control" type="text" name="Modal_SpoolCaseMappingandDetails[@j].SpoolNumber" value="@Model.SpoolCaseMappingandDetails[@j].SpoolNumber" />
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    { j = j + 1; }
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <fieldset class="border p-2">
+        <legend class="float-none w-auto p-2">General Details</legend>
+        <div class="row">
+            <div class="col-md-3">
+                <label for="RequestNumber" class="control-label" data-translate="RequestNumber">
+                    Request Number
+                    <span class="air_mandatory" style="color: red"></span>
+                </label>
+                @Html.HiddenFor(model => model.IndentId, new { id = "hdnDispatchId" })
+                @Html.TextBoxFor(m => m.InvoiceNumber, new
+           {
+               @maxlength = "12",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtRequestnumber",
+               readOnly = true
+
+           })
+            </div>
+            <div class="col-md-3">
+                <label for="RequestDate" class="control-label" data-translate="RequestDate">
+                    Dispatch On
+                    <span class="air_mandatory" style="color: red"></span>
+                </label>
+                @Html.TextBoxFor(m => m.InvoiceDate, new
+           {
+               @maxlength = "12",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtRequestdate",
+               readOnly = true
+           })
+            </div>
+            <div class="col-md-3">
+                <label for="Supplier" class="control-label" data-translate="Supplier">
+                    Dispatch By
+                    <span class="air_mandatory" style="color: red"></span>
+                </label>
+                @Html.TextBoxFor(m => m.DispatchedBy, new
+           {
+               @maxlength = "12",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtSupplier",
+               readOnly = true
+           })
+            </div>
+            <div class="col-md-3">
+                <label for="LabelQuantty" class="control-label" data-translate="LabelQuantty">
+                    Label Quantity
+                    <span class="air_mandatory" style="color: red"></span>
+                </label>
+                @Html.TextBoxFor(m => m.DispatchQuantity, new
+           {
+               @maxlength = "12",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtLabel",
+               readOnly = true
+           })
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-3">
+                <label for="Box Quantity" class="control-label" data-translate="Box Quantity">
+                    Box Quantity
+                    <span class="air_mandatory" style="color: red"></span>
+                </label>
+                @Html.TextBoxFor(m => m.ApprovedQty, new
+           {
+               @maxlength = "12",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtBoxquantity",
+               readOnly = true
+           })
+            </div>
+        </div>
+    </fieldset>
+    <br />
+    <fieldset class="border p-2">
+        <legend class="float-none w-auto p-2">Box Details</legend>
+
+        <div class="row">
+            <div id="req_input" class="datainputs row">
+                <!-- Label for Box Number -->
+                <label for="BoxNumber" class="control-label mandatory" data-translate="BoxNumber">
+                    Box Number
+                </label>
+
+                <!-- Container for dynamic textboxes -->
+                <div id="dynamicTextBoxContainer">
+                    @for (int i = 0; i < Model.DispatchTransactionDetails.Count(); i++)
+                    {
+                        <div class="row">
+                            <div class="col-md-3 form-group">
+
+
+                                <input type="text" name="DispatchTransactionDetails[@i].CaseNumber" maxlength="30" class="form-control CaseNumber"
+                                       autocomplete="off" onkeypress="return numbersonly(event,this)" id="txtBoxNumber_@i"
+                                       placeholder="Scan Box No." value="@Model.DispatchTransactionDetails[i].CaseNumber" oninput="this.value = this.value.trim().replace(/[^a-zA-Z0-9 ]+/g, '');" />
+                                <span class="text-danger" id="dspBoxNumber"></span>
+                            </div>
+                            <div class="col-md-3">
+
+                                @*<button type="button" id="btnLoad" value="GetDetails" class="btn btn-sm btn-success" data-translate="Load">Get Details</button>*@
+                                <button type="button" id="btnLoad_@i" value="GetDetails" class="btn btn-sm btn-primary btnload" data-translate="Load" onclick="getDetails(@i)">Get Details </button>
+                                <i class="fa fa-plus" style="color:green!important" id="plus" onclick="addTextBox()"></i>
+
+                            </div>
+                            <!-- Plus icon to add more textboxes -->
+
+                            @if (i > 0)
+                            {
+                                <!-- Minus icon to remove textboxes -->
+                                <i class="fa fa-minus" style="color:red!important" id="minus" onclick="removeTextBox(this)"></i>
+                            }
+                        </div>
+                    }
+                    <!-- Minus icon to remove textboxes -->
+                    @*<i class="fa fa-minus" style="color:red!important" onclick="removeTextBox(this)"></i>*@
+
+                </div>
+
+                <!-- Button to load details -->
+
+            </div>
+
+        </div>
+    </fieldset>
+    <br />
+    <fieldset class="border p-2">
+        <legend class="float-none w-auto p-2">Dispatch Details</legend>
+        <div class="row">
+
+            <div class="col-md-3">
+                <label for="DispatchNumber" class="control-label" data-translate="DispatchNumber">
+                    Dispatch Number
+                    <span class="air_mandatory" style="color: red"></span>
+                </label>
+                @Html.TextBoxFor(m => m.DispatchNumber, new
+           {
+               @maxlength = "12",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtDispatchnumber",
+               placeHolder = "Enter Dispatch Number",
+            oninput="this.value = this.value.replace(/[^a-zA-Z0-9]+/g, '').trim();"
+           })
+                @Html.ValidationMessageFor(m => m.DispatchNumber, "", new { @class = "text-danger", id = "dspDispatchnumber" })
+            </div>
+            <div class="col-md-3">
+                <label for="DispatchOn" class="control-label" data-translate="DispatchOn">
+                    Dispatch On
+                    <span class="air_mandatory" style="color: red"></span>
+                </label>
+                @Html.TextBoxFor(m => m.CreatedOn, new
+           {
+               @maxlength = "12",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtDispatchon",
+               placeHolder = "Enter Dispatch On"
+           })
+                @Html.ValidationMessageFor(m => m.CreatedOn, "", new { @class = "text-danger", id = "dspCreatedOn" })
+            </div>
+            <div class="col-md-3">
+                <label for="DispatchBy" class="control-label" data-translate="DispatchBy">
+                    Dispatch By
+                    <span class="air_mandatory" style="color: red"></span>
+                </label>
+                @Html.TextBoxFor(m => m.CreatedBy, new
+           {
+               @maxlength = "12",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtDispatchby",
+               placeHolder = "Enter Dispatch By",
+            oninput="this.value = this.value.trim().replace(/[^0-9]+/g, '');"
+           })
+                @Html.ValidationMessageFor(m => m.CreatedBy, "", new { @class = "text-danger", id = "dspCreatedBy" })
+            </div>
+            <div class="col-md-3">
+                <label for="HandoverTo" class="control-label" data-translate="HandoverTo">
+                    Handover To
+                    <span class="air_mandatory" style="color: red"></span>
+                </label>
+                @Html.TextBoxFor(m => m.HandoverTo, new
+           {
+               @maxlength = "12",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtHandover",
+               placeHolder = "Enter Handover To",
+            oninput="this.value = this.value.replace(/[^a-zA-Z]+/g, '').trim();"
+           })
+                @Html.ValidationMessageFor(m => m.HandoverTo, "", new { @class = "text-danger", id = "dspRecievedBy" })
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-3">
+                <label for="HandoverTo" class="control-label" data-translate="HandoverTo">
+                    Vehicle Number
+                    <span class="air_mandatory" style="color: red"></span>
+                </label>
+                @Html.TextBoxFor(m => m.VechileNumber, new
+           {
+               @maxlength = "12",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtVehiclenumber",
+               placeHolder = "Enter Vehicle number",
+               oninput="this.value = this.value.trim().replace(/[^a-zA-Z0-9#]+/g, '');"
+               
+           })
+                @Html.ValidationMessageFor(m => m.VechileNumber, "", new { @class = "text-danger", id = "dspVechileNumber" , oninput="this.value = this.value.trim().replace(/[^a-zA-Z0-9]+/g, '');"})
+            </div>
+            <div class="col-md-3 file">
+                <label for="File Upload" class="control-label" data-translate="File Upload">
+                    File Upload
+                    <span class="air_mandatory" style="color: red"></span>
+                </label>
+                <input type="file" id="fileUpload" class="form-control" name="file" single />
+            </div>
+        </div>
+    </fieldset>
+    <br />
+    <br />
+    <div class="text-center">
+        <button type="submit" id="btnSubmit" style="visibility:hidden" class="btn btn-secondary-gradien" data-translate="Submit">Submit</button>
+        <button type="submit" id="btnSave" class="btn btn-success" data-translate="Save">Save</button>
+        <button type="button" id="btnCancel" class="btn btn-danger" data-translate="Cancel">Cancel</button>
+        <button type="button" id="printInvoice" class="btn btn-primary" data-translate="print Invoice" style="display: none;">Dispatch Invoice</button>
+    </div>
+}
+@if (Model.ResponseCode >= 200&&Model.ResponseCode <= 299)
+{
+<script type="text/javascript">
+    $(document).ready(function () {
+        swal({
+            title: '',
+            text: "Production Dispatch Details Saved Successfully",
+            type: "Success"
+        }).then(function () {
+            window.location.href = "../ProductionDispatch/ProductionDispatchView";
+        });
+    });
+</script>
+}
+
+@if (Model.ResponseCode >= 400 && Model.ResponseCode <=500)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Something Went Wrong: 404",
+                type: "error"
+            }).then(function () {
+                window.location.href = "../ProductionDispatch/ProductionDispatchView";
+            });
+        });
+    </script>
+}
+
+@if (Model.ViewStatus =="V")
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            debugger;
+            $('#btnSave').hide();
+            $('#btnCancel').hide();
+            $('#printInvoice').show();
+            $('.btnload').hide();
+            $(".file").hide();
+            var length = @Model.DispatchTransactionDetails.Count;
+            document.querySelectorAll("[id='plus']").forEach(function (element) {
+             element.style.display = "none";
+            });
+            document.querySelectorAll("[id='minus']").forEach(function (element) {
+                element.style.display = "none";
+            });
+            $("#txtVehiclenumber").attr("disabled", true);
+            $("#txtHandover").attr("disabled", true);
+            $("#txtHandover").attr("disabled", true);
+            $("#txtDispatchnumber").attr("disabled", true);
+            $("#txtDispatchon").attr("disabled", true);
+            $("#txtDispatchby").attr("disabled", true);
+            $("#txtDispatchby").attr("disabled", true);
+            $(".CaseNumber").attr("disabled", true);
+
+        });
+    </script>
+}
+<script type="text/javascript">
+
+    if ('@Model.IndentId' != 0) {
+        debugger;
+        var dispatchon = $('#txtRequestdate').val();
+        var daterequest = dispatchon.split(' ')[0];
+        var formatedrequestDate = formatDate(daterequest);
+        $('#txtRequestdate').val(formatedrequestDate);
+
+    }
+
+
+
+    $("#txtDispatchon").datepicker({
+        dateFormat: "dd-M-yy",
+        maxDate: 0,
+        changeMonth: true,
+        changeYear: true,
+        defaultDate: new Date(),
+        onSelect: function (evnt) {
+            $(this).tooltip("dispose");
+        }
+    });
+    $("#txtDispatchon").datepicker("setDate", new Date());
+
+
+    $('#btnBack').click(function () {
+         var url = '@Url.Action("ProductionDispatchView", "ProductionDispatch")';
+        window.location.href = url;
+
+
+
+    });
+
+
+    $('#btnCancel').click(function () {
+         var url = '@Url.Action("ProductionDispatchView", "ProductionDispatch")';
+         window.location.href = url;
+    });
+
+    $('#printInvoice').click(function () {
+        window.location.href = "../ProductionDispatch/ProductionDispatchInvoicePrint?indentId=" + @Model.IndentId;
+    });
+
+    $(document).ready(function () {
+
+        $("#btnSave").click(function () {
+            debugger;
+            if ($('#txtBoxNumber').val() == "") {
+                $('#dspBoxNumber').html("Please Scan Box Number");
+                $('#txtBoxNumber').focus();
+                return false;
+            }
+            else {
+                $('#dspBoxNumber').html("");
+            }
+            if ($('#txtDispatchnumber').val() == "") {
+                $('#dspDispatchnumber').html("Please Enter Dispatch Number");
+                $('#txtDispatchnumber').focus();
+                return false;
+            }
+            else {
+                $('#dspDispatchnumber').html("");
+            }
+            if ($('#txtDispatchon').val() == "") {
+                $('#dspCreatedOn').html("Please Enter Dispatch On");
+                $('#txtDispatchon').focus();
+                return false;
+            }
+            else {
+                $('#dspCreatedOn').html("");
+            }
+
+            if ($('#txtDispatchby').val() == "") {
+                $('#dspCreatedBy').html("Please Enter Dispatch By");
+                $('#txtDispatchby').focus();
+                return false;
+            }
+            else {
+                $('#dspCreatedBy').html("");
+            }
+            if ($('#txtHandover').val() == "") {
+                $('#dspRecievedBy').html("Please Enter Handover");
+                $('#txtHandover').focus();
+                return false;
+            }
+            else {
+                $('#dspCreatedOn').html("");
+            }
+            if ($('#txtVehiclenumber').val() == "") {
+                $('#dspVechileNumber').html("Please Enter Vehicle Number");
+                $('#txtVehiclenumber').focus();
+                return false;
+            }
+            else {
+                $('#dspVechileNumber').html("");
+            }
+            if ($('#fileUpload').val() == "") {
+                $('#dspfile').html("Please select file");
+                $('#fileUpload').focus();
+                return false;
+            }
+            else {
+                $('#dspfile').html("");
+                return true;
+            }
+
+        });
+        $("#btnLoad").click(function () {
+            var boxNumber = $("#txtBoxNumber").val();
+            $('#lblCaseNo').html(boxNumber);
+            if (boxNumber != "") {
+                $.ajax({
+                    type: "GET",
+                    url: "../SpoolBoxMapping/SpoolCaseMappingGetByBoxNumber",
+                    data: { boxNumber: boxNumber },
+                    success: function (data) {
+
+                        if (data.data.SpoolCaseMappingandDetails.length > 0) {
+                            $("#modalbox").modal("show");
+                            for (var i = 0; i < data.data.SpoolCaseMappingandDetails.length; i++) {
+
+                                $("input[name='Modal_SpoolCaseMappingandDetails[" + i + "].SpoolFirstNumber']").val(data.data.SpoolCaseMappingandDetails[i].SpoolFirstNumber);
+                                $("input[name='Modal_SpoolCaseMappingandDetails[" + i + "].SpoolNumber']").val(data.data.SpoolCaseMappingandDetails[i].SpoolNumber);
+                            }
+                        }
+                        else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: "Data Not Found!",
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("While your processing getting error...!!");
+                    }
+                });
+            }
+            else {
+                Swal.fire("Add Box Number!");
+            }
+        });
+    });
+
+
+    function addTextBox() {
+        debugger;
+        // Get the container for dynamic textboxes
+        var container = $("#dynamicTextBoxContainer");
+
+        // Get the index for naming the new textbox
+        var index = container.find("input").length;
+
+        // HTML for a new set of textbox and related elements
+        var newTextBox = '<div class="row hide"><div class="col-md-3 form-group">' +
+            '<input type="text" name="DispatchTransactionDetails[' + index + '].CaseNumber" maxlength="30" class="form-control CaseNumber" ' +
+            'autocomplete="off" onkeypress="return numbersonly(event,this)" placeholder="Scan Box No." id="txtBoxNumber_' + index + '" />' +
+            '<span class="text-danger" id="dspBoxNumber_' + index + '"></span> </div>' +
+            '<div class="col-md-3"> <button type="button" id="btnLoad_' + index + '" value="GetDetails" class="btn btn-sm btn-primary" data-translate="Load" onclick="getDetails(' + index + ')">Get Details</button><i class="fa fa-minus" style="color:red!important;padding-left:4px" onclick="removeTextBox(this)"></i></div>'
+            '</div> ';
+
+
+        // Append the new set of elements to the container
+        container.append(newTextBox);
+    }
+
+    function removeTextBox(icon) {
+        // Remove the closest parent div with the class "row"
+        $(icon).closest('.row').remove();
+    }
+
+
+    function getDetails(index) {
+        debugger;
+        var boxNumber = $("#txtBoxNumber_" + index).val();
+        $('#lblCaseNo').html(boxNumber);
+        if (boxNumber != "") {
+            $.ajax({
+                type: "GET",
+                url: "../SpoolBoxMapping/SpoolCaseMappingGetByBoxNumber",
+                data: { boxNumber: boxNumber },
+                success: function (data) {
+                    if (data.data.SpoolCaseMappingandDetails.length > 0) {
+                        $("#modalbox").modal("show");
+                        for (var i = 0; i < data.data.SpoolCaseMappingandDetails.length; i++) {
+                            $("input[name='Modal_SpoolCaseMappingandDetails[" + i + "].SpoolFirstNumber']").val(data.data.SpoolCaseMappingandDetails[i].SpoolFirstNumber);
+                            $("input[name='Modal_SpoolCaseMappingandDetails[" + i + "].SpoolNumber']").val(data.data.SpoolCaseMappingandDetails[i].SpoolNumber);
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Data Not Found!",
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("While your processing getting an error...!!");
+                }
+            });
+        } else {
+            Swal.fire("Add Box Number!");
+        }
+    }
+    function formatDate(dateString) {
+        debugger;
+        var parts = dateString.split('-');
+        var day = parseInt(parts[0], 10);
+        var month = parseInt(parts[1], 10) - 1; // Month is zero-based
+        var year = parseInt(parts[2], 10);
+        var formattedDate = new Date(year, month, day);
+
+        var options = { day: '2-digit', month: 'short', year: 'numeric' };
+        return formattedDate.toLocaleDateString('en-IN', options).toUpperCase();
+    }
+
+</script>

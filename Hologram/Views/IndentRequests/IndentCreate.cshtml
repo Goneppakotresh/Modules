@@ -1,0 +1,271 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.ResponseModel.IndentCreate
+
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .hidden {
+        display: none;
+    }
+
+    .form-group label {
+        width: auto !important
+    }
+</style>
+@using (Html.BeginForm())
+{
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12">
+                <h3><span data-translate="Indent Create">Indent Create</span><button type="button" class="btn btn-primary pull-right" id="btnClose"> Back</button></h3>
+            </div>
+        </div>
+    </div>
+
+    <fieldset class="border p-2">
+        <legend class="float-none w-auto p-2" data-translate="Indent Details">Indent Details</legend>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label data-translate="Name">Request Date</label><span style="color:red">*</span>
+                    @Html.TextBoxFor(model => model.RequestDate, new { @class = "form-control", id = "requestDate", @readonly = "readonly" })
+                    @Html.ValidationMessageFor(model => model.RequestDate, "", new { @class = "text-danger validation-message", id = "errortxtRequestDate" })
+                </div>
+            </div>
+            <div class="col-md-3" id="hideRequestNo">
+                <div class="form-group">
+                    <label data-translate="Father's Name">Request No.</label><span style="color:red">*</span>
+                    @Html.EditorFor(model => model.RequestNumber, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly", id = "txtReqeustNo", @placeholder = "Auto Generated", @maxlength = "50" } })
+                    @Html.ValidationMessageFor(model => model.RequestNumber, "", new { @class = "text-danger validation-message", id = "errortxtReqeustNo" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label data-translate="Date Of Birth">Box Quantity</label><span style="color:red">*</span>
+                    @Html.TextBoxFor(model => model.CaseQuantity, new { @class = "form-control numbers", @id = "txtBoxQty", onchange = "return GetHologramQty(this.value)" ,autocomplete = "off",})
+                    @Html.ValidationMessageFor(model => model.CaseQuantity, "", new { @class = "text-danger validation-message", id = "errortxtBoxQty" })
+                    
+                    <div>
+                        <span style="color:red">Note. Each Box will contain 60000 holograms</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label data-translate="Caste">Hologram Quantity</label><span style="color:red">*</span>
+                    @Html.TextBoxFor(model => model.RequestLabelQuantity, new { @class = "form-control numbers", id = "txtHologramQty", @maxlength = "30", @readonly = "readonly" })
+                    @Html.ValidationMessageFor(model => model.HologramQuantity, "", new { @class = "text-danger validation-message", id = "errortxtHologramQty" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label data-translate="Phone">GRN No</label><span style="color:red">*</span>
+                    @Html.TextBoxFor(model => model.GoodReceivedNoteNumber, new { @class = " form-control", maxlength = 10, @id = "txtGrnNo" ,autocomplete = "off",})
+                    @Html.ValidationMessageFor(model => model.GoodReceivedNoteNumber, "", new { @class = "text-danger validation-message", id = "errorgrnmessage" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label data-translate="EMail">GRN Date</label><span style="color:red">*</span>
+                    @Html.TextBoxFor(m => m.GoodReceivedNoteDate, new
+                {
+                @maxlength = "12",
+                @class = "form-control datepicker",
+                autocomplete = "off",
+                id = "txtGrnDate",
+                placeholder = "DD-MM-YYYY",
+                @readonly = "readonly"
+                })
+                    @Html.ValidationMessageFor(model => model.GoodReceivedNoteDate, "", new { @class = "text-danger validation-message", id = "errorEmail" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label data-translate="Phone">Available Balance (in Rs.)</label><span style="color:red">*</span>
+                    @Html.TextBoxFor(model => model.AvailableBalance, new { @class = " form-control", @id = "txtAvailableBalance" /* , @readonly = "readonly" */ })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label data-translate="Phone">Cost Per Hologram(in Rs.)</label><span style="color:red">*</span>
+                    @Html.TextBoxFor(model => model.CostPerHologram, new { @class = " form-control", @id = "txtCostPerHologram", @readonly = "readonly" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label data-translate="Phone">Total Amount(inc. GST)</label><span style="color:red">*</span>
+                    @Html.TextBoxFor(model => model.TotalAmount, new { @class = " form-control", @id = "txtTotAmount", @readonly = "readonly" })
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="text-center">
+            <div class="text-center">
+                <input type="submit" id="btnSave" value="Save" class="btn btn-success" />
+                <input type="button" id="epay" value="E-Pay" class="btn btn-success" style="display: none;" />
+                <input type="button" id="printIndent" value="Indent Print" class="btn btn-primary" style="display: none;" />
+            </div>
+        </div>
+    </fieldset>
+}
+@if (Model.ResponseCode >= 200 && Model.ResponseCode <= 300)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Indent Details Saved Successfully with Request No." + '@Model.RequestNumber',
+                type: "Success"
+            }).then(function () {
+                window.location.href = "../IndentRequests/IndentRequests";
+            });
+        });
+    </script>
+}
+@if (Model.ResponseCode >= 400 && Model.ResponseCode <= 500)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Something Went Wrong:404",
+                type: "Success"
+            }).then(function () {
+                window.location.href = "../IndentRequests/IndentRequests";
+            });
+        });
+    </script>
+}
+<script type="text/javascript">
+    $('#printIndent').click(function () {
+        window.location.href = "../IndentRequests/IndentDetailsPdf?indentId=" + @Model.HologramIndentId;
+    });
+    $(document).ready(function () {
+        debugger
+        if ('@Model.HologramIndentId' != 0) {
+            var boxQty = $('#txtBoxQty').val();
+           
+            debugger;
+            $('#requestDate').attr("disabled", true);
+            $('#txtGrnNo').attr("disabled", true);
+            $('#txtGrnDate').attr("disabled", true);
+            $('#txtBoxQty').attr("disabled", true);
+            $('#txtAvailableBalance').attr("disabled", true);
+            $('#btnSave').hide();
+            if (@Model.Status==1) {
+            $('#printIndent').show();
+            }
+            var grnDate = $('#txtGrnDate').val();
+            var dateWithoutTime = grnDate.split(' ')[0];
+            var formattingDate = formatDate(dateWithoutTime);
+            $('#txtGrnDate').val(formattingDate);
+            var requestDate = $('#requestDate').val();
+            var daterequest = requestDate.split(' ')[0];
+            var formatedrequestDate = formatDate(daterequest);
+            $('#requestDate').val(formatedrequestDate);
+
+        }
+        else{
+            $('#hideRequestNo').hide();
+            $('#requestDate').datepicker({
+                "setDate": new Date(),
+                "autoclose": true
+            }).datepicker("setDate", 'now');
+        }
+        $('#txtCostPerHologram').val("0.292");
+    });
+   
+    $('#txtGrnDate').datepicker({
+        dateFormat: "dd-M-yy",
+        changeMonth: true,
+        changeYear: true,
+
+    });
+    $("#btnClose").click(function () {
+        var url = '@Url.Action("IndentRequests", "IndentRequests")';
+        window.location.href = url;
+    });
+    function GetHologramQty(qty) {
+        $('#txtCostPerHologram').val("0.292");
+        var hologramtqy = parseInt(qty) * 60000;
+        var costPerHologram = parseFloat($('#txtCostPerHologram').val());
+        var totatAmount = parseInt(hologramtqy) * costPerHologram;
+        $('#txtTotAmount').val(totatAmount);
+        $('#txtHologramQty').val(hologramtqy);
+    }
+    $('#txtBoxQty').on('input', function () {
+        var boxQty = parseInt($(this).val()) || 0;
+        if (boxQty == "") {
+            boxQty = 0;
+        }
+        $('#txtCostPerHologram').val("0.292");
+        var hologramtqy = boxQty * 60000;
+        var costPerHologram = parseFloat($('#txtCostPerHologram').val());
+        var totatAmount = parseInt(hologramtqy) * costPerHologram;
+        $('#txtTotAmount').val(totatAmount);
+        $('#txtHologramQty').val(hologramtqy);
+    });
+
+    $('#txtAvailableBalance').on('input', function () {
+        var availableBalance = parseInt($(this).val()) || 0;
+        var totalAmount = parseInt($('#txtTotAmount').val()) || 0;
+
+        if (availableBalance < totalAmount) {
+            $('#btnSave').hide();
+            $('#epay').show();
+        } else {
+            $('#btnSave').show();
+            $('#epay').hide();
+        }
+    });
+
+
+    $('#btnSave').click(function () {
+        var isValidate = true;
+        var boxQty = $('#txtBoxQty').val();
+        var grnNo = $('#txtGrnNo').val();
+        var grnDate = $('#txtGrnDate').val();
+
+        if (boxQty == "0" || boxQty == "" || boxQty == null) {
+            $('#errortxtBoxQty').html("Please Enter Box Quantity Number");
+            $('#txtBoxQty').focus();
+            isValidate = false;
+            return false;
+        } else {
+            $('#errortxtBoxQty').html("");
+        }
+
+        if (grnNo == "0" || grnNo == "" || grnNo == null) {
+            $('#errortxtGrnNo').html("Please Enter GRN Number");
+            $('#txtGrnNo').focus();
+            isValidate = false;
+            return false;
+        } else {
+            $('#errortxtGrnNo').html("");
+        }
+
+        if (grnDate == "0" || grnDate == "" || grnDate == null) {
+            $('#errorgrnmessage').html("Please Enter GRN Date");
+            $('#txtGrnDate').focus();
+            isValidate = false;
+            return false;
+        } else {
+            $('#errorgrnmessage').html("");
+        }
+
+    });
+    function formatDate(dateString) {
+        debugger;
+        var parts = dateString.split('-');
+        var day = parseInt(parts[0], 10);
+        var month = parseInt(parts[1], 10) - 1; 
+        var year = parseInt(parts[2], 10);
+        var formattedDate = new Date(year, month, day);
+
+        var options = { day: '2-digit', month: 'short', year: 'numeric' };
+        return formattedDate.toLocaleDateString('en-IN', options).toUpperCase();
+    }
+
+
+</script>

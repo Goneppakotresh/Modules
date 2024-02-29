@@ -1,0 +1,123 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.ProductionDispatch
+@{
+    ViewBag.Title = "ProductionDispatch";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Dispatch To Production List</span>
+                @*<button type="button" class="btn btn-success pull-right" id="btnnew" data-translate="Create">
+                    <i class="fa fa-plus"></i> Create
+                </button>*@
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="container-fluid">
+        <table id="GridDispatchProductinDetails" cellpadding="0" cellspacing="0" style="width:100%!important" class="table dispaly">
+            <thead>
+                <tr style="text-align: center;">
+                    <th style="text-align: center;" class="green" data-translate="Serial.No">Serial.No</th>
+                    <th style="text-align: center;" class="green" data-translate="Request Date">Request Id</th>
+                    <th style="text-align: center;" class="green" data-translate="Request Number">Request Number</th>
+                    <th style="text-align: center;" class="green" data-translate="Box Quantity">Box Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Label Quantity">Label Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Status">Status</th>
+                    <th style="text-align: center;" class="green" data-translate="Action">Action</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnnew").click(function () {
+             var url = '@Url.Action("ProductionDispatch", "ProductionDispatch")';
+             window.location.href = url;
+        });
+
+        $('#GridDispatchProductinDetails').DataTable({
+            "ajax": {
+                "url": "../ProductionDispatch/GetAllProductionDispatchDetails",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": null, "defaultContent": "", "orderable": true, "class": "dt-center" },
+                { "data": 'HologramIndentId', "autoWidth": true ,"visible": false },
+                { "data": 'RequestNumber', "autoWidth": true },
+                { "data": 'CaseQuantity', "autoWidth": true },
+                { "data": 'CaseQuantity', "autoWidth": true },
+                {
+                    "data": "Status", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        if (row.Status == 1) {
+                            return '<label for="Submitted" class="control-label"><b>Pending For Dispatch</b></label>';
+                        }
+                        else if (row.Status == 3) {
+                            return '<label for="Submitted" class="control-label"><b>Received</b></label>';
+                        }
+                        else {
+                            return '<label for="Pending" class="control-label"><b>Pending For Receive</b></label>';
+                        }
+                    }
+                },
+                    {
+                    "data": "DispatchId", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        if (row.Status == "3") {
+                            return '<a  href="javascript:ViewClick(\'' + row.HologramIndentId + '\', \'V\')" title = "View" > <i class="fa fa-eye" style="font-size:16px"></i></a > ';
+                        }
+                        else if (row.Status == "2") {
+                            return '<a  href="javascript:ViewClick(\'' + row.HologramIndentId + '\', \'V\')" title = "View" > <i class="fa fa-eye" style="font-size:16px"></i></a > ';
+                        }
+                        else {
+                            return '<a title="Click here to Edit" href="javascript:EditClick(\'' + row.HologramIndentId + '\', \'E\')"><i class="fa fa-edit" style="font-size: 16px"></i></a>';
+                        }
+                    }
+                }
+            ],
+            "columnDefs": [
+                {
+                    "targets": 0, // Target the first column (Serial Number)
+                    "data": null,
+                    "render": function (data, type, row, meta) {
+                        // Use meta.row to get the current row index and add 1 to start from 1
+                        return meta.row + 1;
+                    }
+                }
+            ]
+        });
+
+    });
+
+    function EditClick(Id) {
+        var link = "@Url.Action("GetProductionDispatchEditDetail", "ProductionDispatch")";
+        $.post(link, { ReqId: Id, StatusValue: 'E' },
+            function (data) {
+                window.location.href = "../ProductionDispatch/ProductionDispatch";
+            })
+    }
+    function ViewClick(Id) {
+        debugger;
+        $.ajax({
+            url: '@Url.Action("GetProductionDispatchViewDetail", "ProductionDispatch")',
+            type: 'POST',
+            data: { ReqId: Id, StatusValue: 'V' },
+            dataType: 'json',
+            success: function (data) {
+                document.location.href = "../ProductionDispatch/ProductionDispatch";
+            },
+            error: function () {
+                // Handle error here
+                console.log('Error fetching states.');
+            }
+        });
+
+    }
+</script>

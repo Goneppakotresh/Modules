@@ -1,0 +1,145 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.SpoolBoxLabelPrint
+@{
+    ViewBag.Title = "SpoolBoxLabelPrintCreation";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Spool & Box Label Print</span>
+                <button type="button" class="btn btn-success pull-right" id="btnBack" data-translate="Back">
+                    <i class="fa fa-plus"></i> Back
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="row">
+        <div class="col-md-3">
+            <label for="RequestDate" class="control-label" data-translate="RequestDate">
+                Request Date
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.requestDate, new
+       {
+           @maxlength = "12",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtRequestdate"
+       })
+            @Html.ValidationMessageFor(m => m.requestDate, "", new { @class = "text-danger", id = "dspRequestDate" })
+        </div>
+        <div class="col-md-3">
+            <label for="Request Number" class="control-label" data-translate="RequestNumber">
+                Request Number
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.requestNumber, new
+       {
+           @maxlength = "12",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtReqNumber",
+           Readonly = true
+       })
+        </div>
+        <div class="col-md-3">
+            <label for="boxes" class="control-label" data-translate="boxes">
+                Total No Of Boxes
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.boxes, new
+       {
+           @maxlength = "12",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtBoxes",
+           placeHolder = "enter box number"
+       })
+            @Html.ValidationMessageFor(m => m.boxes, "", new { @class = "text-danger", id = "dspBoxes" })
+        </div>
+        <div class="col-md-3">
+            <label for="boxes" class="control-label" data-translate="boxes">
+                Total No Of Spool
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.spool, new
+       {
+           @maxlength = "15",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtSpool",
+           placeHolder="enter spool number"
+       })
+            @Html.ValidationMessageFor(m => m.spool, "", new { @class = "text-danger", id = "dspSpool" })
+
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="text-center">
+        <button type="submit" id="btnSave" class="btn btn-success" data-translate="Save">Save</button>
+        <button type="button" id="btnSubmit" class="btn btn-secondary-gradient" data-translate="Submit">Confirm & Lock</button>
+        <button type="button" id="btnCancel" class="btn btn-danger" data-translate="Cancel">Cancel</button>
+    </div>
+}
+<script type="text/javascript">
+    $("#btnBack").click(function () {
+        window.location.href = "../SpoolBoxLabelPrint/SpoolBoxLabelPrint";
+    });
+    $("#txtRequestdate").datepicker({
+        dateFormat: "dd-M-yy",
+        maxDate: 0,
+        changeMonth: true,
+        changeYear: true,
+        defaultDate: new Date(),
+        onSelect: function (evnt) {
+            $(this).tooltip("dispose");
+        }
+    });
+    $("#txtRequestdate").datepicker("setDate", new Date());
+
+    $(document).ready(function () {
+        $("#btnSave").click(function () {
+            debugger;
+            $('#txtDispatchqty').prop("disabled:false");
+
+
+            if ($('#txtRequestdate').val() == "") {
+                $('#dspRequestDate').html("Please select date");
+                $('#txtRequestdate').focus();
+                return false;
+            }
+            else {
+                $('#dspRequestDate').html("");
+            }
+
+            if ($('#txtBoxes').val() == "") {
+                $('#dspBoxes').html("Please enter box number");
+                $('#txtBoxes').focus();
+                return false;
+            }
+            else {
+                $('#dspBoxes').html("");
+            }
+
+            if ($('#txtSpool').val() == "") {
+                $('#dspSpool').html("Please enter spool number");
+                $('#txtSpool').focus();
+                return false;
+            }
+            else {
+                $('#dspSpool').html("");
+            }
+
+        });
+
+    });
+</script>
+

@@ -1,0 +1,139 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.ProductionDispatchReceiveModel
+
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Dispatch To Production Receive List</span>
+                @*<button type="button" class="btn btn-success pull-right" id="btnnew" data-translate="Create">
+                    <i class="fa fa-plus"></i> Create
+                </button>*@
+            </h3>
+
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="container-fluid">
+        <table id="GridDispatchProductinDetails" cellpadding="0" cellspacing="0" style="width:100%!important" class="table dispaly">
+            <thead>
+                <tr style="text-align: center;">
+                    <th style="text-align: center;" class="green" data-translate="Request Date">Serial.No</th>
+                    <th style="text-align: center;" class="green" data-translate="Request Date">Dispatch ID</th>
+                    @*<th style="text-align: center;" class="green" data-translate="Request Date">Request Date</th>*@
+                    <th style="text-align: center;" class="green" data-translate="Request Number">Request Number</th>
+                    @*<th style="text-align: center;" class="green" data-translate="Supplier">Supplier</th>*@
+                    <th style="text-align: center;" class="green" data-translate="Box Quantity">Box Quantity(in No)</th>
+                    <th style="text-align: center;" class="green" data-translate="Label Quantity">Label Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Status">Status</th>
+                    <th style="text-align: center;" class="green" data-translate="Action">Action</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnnew").click(function () {
+             var url = '@Url.Action("ProductionDispatchReceive", "ProductionDispatchReceive")';
+             window.location.href = url;
+        });
+
+        $('#GridDispatchProductinDetails').DataTable({
+            "ajax": {
+                "url": "../ProductionDispatchReceive/GetAllProductionDispatchReceiveDetails",
+                "type": "POST",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": null, "defaultContent": "", "orderable": true, "class": "dt-center" },
+                { "data": 'DispatchId', "autoWidth": true, "visible": false },
+              /*  { "data": 'InvoiceDate', "autoWidth": true, "visible": false },*/
+                { "data": 'InvoiceNumber', "autoWidth": true },
+               /* { "data": 'Supplier', "autoWidth": true },*/
+                { "data": 'DispatchQuantity', "autoWidth": true },
+                { "data": 'ApprovedQty', "autoWidth": true },
+                {
+                    "data": "Status", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        debugger;
+                        if (row.Status == "3") {
+                            return '<label for="Submitted" class="control-label"><b>Received</b></label>';
+                        }
+                        else {
+                            return '<label for="Pending" class="control-label"><b>Pending</b></label>';
+                        }
+                    }
+                },
+               
+                {
+                    "data": "DispatchId", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        if (row.Status == "3") {
+                            return '<a  href="javascript:ViewClick(\'' + row.DispatchId + '\', \'V\')" title = "View" > <i class="fa fa-eye" style="font-size:16px"></i></a > ';
+                        } else {
+                            return '<a title="Click here to Edit" href="javascript:EditClick(\'' + row.DispatchId + '\', \'E\')"><i class="fa fa-edit" style="font-size: 16px"></i></a>';
+                        }
+                    }
+                }
+
+            ],
+            "columnDefs": [
+                {
+                    "targets": 0, // Target the first column (Serial Number)
+                    "data": null,
+                    "render": function (data, type, row, meta) {
+                        // Use meta.row to get the current row index and add 1 to start from 1
+                        return meta.row + 1;
+                    }
+                }
+            ]
+        });
+
+    });
+
+    function EditClick(DispatchId) {
+     debugger;
+              $.ajax({
+            url: '@Url.Action("ProductionDispatchReceiveDetailsEditById", "ProductionDispatchReceive")',
+                    type: 'POST',
+            data: { dispatchId: DispatchId, status:'E' },
+                    dataType: 'json',
+                    success: function (data) {
+                    document.location.href = "../ProductionDispatchReceive/ProductionDispatchReceive";
+                },
+                error: function () {
+                   // Handle error here
+                    console.log('Error fetching states.');
+                }
+              });
+
+    }
+    function ViewClick(DispatchId) {
+        debugger;
+        $.ajax({
+            url: '@Url.Action("ProductionDispatchReceiveDetailsViewById", "ProductionDispatchReceive")',
+            type: 'POST',
+            data: { dispatchId: DispatchId, status: 'V' },
+            dataType: 'json',
+            success: function (data) {
+                document.location.href = "../ProductionDispatchReceive/ProductionDispatchReceive";
+            },
+            error: function () {
+                // Handle error here
+                console.log('Error fetching states.');
+            }
+        });
+
+    }
+
+
+
+
+
+
+
+</script>

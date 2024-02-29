@@ -1,0 +1,198 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.ResponseModel.BrandCorrectionViewDetails
+@{
+    ViewBag.Title = "BrandCorrection";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Brand Correction</span>
+                <button type="button" class="btn btn-success pull-right" id="btnBack" data-translate="Create">
+                    <i class="fa fa-plus"></i> Back
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="row">
+        <div class="col-md-3 form-group">
+            <label for="Mannufacture Date" class="control-label mandatory" data-translate="Mannufacture Date">
+                Mannufacture Date<span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.MannufactureDate, new
+        {
+        @maxlength = "10",
+        @class = "form-control",
+        autocomplete = "off",
+        id = "txtDate"
+        })
+            @Html.ValidationMessageFor(m => m.MannufactureDate, "", new { @class = "text-danger", id = "dspDate" })
+        </div>
+        <div class="col-md-3 form-group">
+            <label data-translate="BrandName">Old Brandname<span style="color:red"></span></label>
+            @Html.DropDownListFor(m => m.BrandName, Model.lstBrandName, "Select",
+        new
+        {
+        @class = "form-control js-example-basic-single",
+        id = "ddlBrandname"
+        })
+            @Html.ValidationMessageFor(m => m.BrandName, "", new { @class = "text-danger", id = "dspBrandname" })
+
+        </div>
+        <div class="col-md-3 form-group">
+            <label class="control-label mandatory" data-translate="Deo">Old Packing<span style="color:red"></span></label>
+            @Html.DropDownListFor(m => m.OldPacking, Model.lstOldPacking, "Select", new
+        {
+        @class = "form-control js-example-basic-single",
+        id = "ddlPacking"
+        })
+            @Html.ValidationMessageFor(m => m.OldPacking, "", new { @class = "text-danger", id = "dspOldPacking" })
+        </div>
+        <div class="col-md-3 form-group">
+            <label class="control-label mandatory" data-translate="BatchNumber">Batch Number<span style="color:red"></span></label>
+            @Html.DropDownListFor(m => m.BatchNumber, Model.lstBatchNumber, "Select", new
+        {
+        @class = "form-control js-example-basic-single",
+        id = "ddlBatchnumber"
+        })
+            @Html.ValidationMessageFor(m => m.BatchNumber, "", new { @class = "text-danger", id = "dspBatchnumber" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 form-group">
+            <label class="control-label mandatory" data-translate="BrandName">New Brandname<span style="color:red"></span></label>
+            @Html.DropDownListFor(m => m.NewBrandName, Model.lstNewBrandName, "Select", new
+        {
+        @class = "form-control js-example-basic-single",
+        id = "ddlNewBrandname"
+        })
+            @Html.ValidationMessageFor(m => m.NewBrandName, "", new { @class = "text-danger", id = "dspNewBrandname" })
+        </div>
+        <div class="col-md-3 form-group">
+            <label class="control-label mandatory" data-translate="Deo">New Packing<span style="color:red"></span></label>
+            @Html.DropDownListFor(m => m.NewPacking, Model.lstNewPacking, "Select", new
+        {
+        @class = "form-control js-example-basic-single",
+        id = "ddlNewPacking"
+        })
+            @Html.ValidationMessageFor(m => m.NewPacking, "", new { @class = "text-danger", id = "dspNewpacking" })
+        </div>
+    </div>
+    <br />
+    <div class="text-center">
+        <button type="button" value="Save" id="btnSave" class="btn btn-success" data-translate="Submit">Save</button>
+        <button type="submit" value="Submit" id="btnSubmit" class="btn btn-secondary" data-translate="Submit">Submit</button>
+        <button type="button" value="Refresh" id="btnRefresh" class="btn btn-danger" data-translate="Canel">Canel</button>
+    </div>
+}
+
+<script type="text/javascript">
+    $("#btnBack").click(function () {
+        window.location.href = "../BrandCorrection/BrandCorrection";
+    });
+
+    $("#txtDate").datepicker({
+        dateFormat: "dd-M-yy",
+        maxDate: 0,
+        changeMonth: true,
+        changeYear: true,
+        defaultDate: new Date(),
+        onSelect: function (evnt) {
+            $(this).tooltip("dispose");
+        }
+    });
+    $("#txtDate").datepicker("setDate", new Date());
+
+    $(document).ready(function () {
+
+        $("#btnSave").click(function () {
+
+            if ($('#txtDate').val() == "") {
+                $('#dspDate').html("Please select date");
+                $('#txtDate').focus();
+                return false;
+            }
+            else {
+                $('#dspDate').html("");
+            }
+            if ($('#ddlBrandname').val() == 0 || $('#ddlBrandname').val() == "" || $('#ddlBrandname').val() == null) {
+                $('#dspBrandname').html("Please select brand name");
+                $('#ddlBrandname').focus();
+                return false;
+            }
+            else {
+                $('#dspBrandname').html("");
+            }
+            if ($('#ddlPacking').val() == 0 || $('#ddlPacking').val() == "" || $('#ddlPacking').val() == null) {
+                $('#dspOldPacking').html("Please select old packing");
+                $('#ddlPacking').focus();
+                return false;
+            }
+            else {
+                $('#dspOldPacking').html("");
+            }
+            if ($('#ddlBatchnumber').val() == 0 || $('#ddlBatchnumber').val() == "" || $('#ddlBatchnumber').val() == null) {
+                $('#dspBatchnumber').html("Please select batch number");
+                $('#ddlBatchnumber').focus();
+                return false;
+            }
+            else {
+                $('#dspBatchnumber').html("");
+            }
+            if ($('#ddlNewBrandname').val() == 0 || $('#ddlNewBrandname').val() == "" || $('#ddlNewBrandname').val() == null) {
+                $('#dspNewBrandname').html("Please select new brandname");
+                $('#ddlNewBrandname').focus();
+                return false;
+            }
+            else {
+                $('#dspNewBrandname').html("");
+            }
+            if ($('#ddlNewPacking').val() == 0 || $('#ddlNewPacking').val() == "" || $('#ddlNewPacking').val() == null) {
+                $('#dspNewpacking').html("Please select new brandname");
+                $('#ddlNewPacking').focus();
+                return false;
+            }
+            else {
+                $('#dspNewpacking').html("");
+            }
+
+            var date = $('#txtDate').val();
+            var oldbrand = $('#ddlBrandname Option:Selected').val();
+            var oldpack = $('#ddlPacking Option:Selected').val();
+            var batchNum = $('#ddlBatchnumber Option:Selected').val();
+            var newBrand = $('#ddlNewBrandname Option:Selected').val();
+            var newPack = $('#ddlNewPacking Option:Selected').val();
+
+            $.ajax({
+                type: "POST",
+                url: "../BrandCorrection/SaveBrandCorrectionDeatils",
+                dataType: "json",
+                data: { dateval: date, oldBrand: oldbrand, oldPack: oldpack, BatchNum: batchNum, NewBrand: newBrand, NewPack: newPack },
+                success: function (Model) {
+                    if (Model.status == "1" || Model.status == "2") {
+                        swal({
+                            title: '',
+                            text: '@Model.Message',
+                            type: "success"
+                        }).then(function () {
+                            window.location.href = "../BrandCorrection/BrandCorrection";
+                        });
+                    }
+                    else {
+                        swal({
+                            title: '',
+                            text: "Something Went Wrong....",
+                            type: "success"
+                        })
+                    }
+                }
+            })
+
+        });
+
+    });
+</script>

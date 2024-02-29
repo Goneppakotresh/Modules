@@ -1,0 +1,102 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model IEMS_WEB.Areas.Hologram.Models.RequestModel.IssueLabel
+@{
+    ViewBag.Title = "IssueLabelView";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Issue Hologram To Department</span>
+                <button type="button" class="btn btn-success pull-right" id="btnnew" data-translate="Create">
+                    <i class="fa fa-plus"></i> Create
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+@using (Html.BeginForm())
+{
+    <div class="row">
+    </div>
+
+    <div class="container-fluid">
+        <table id="GridIssueLabelDetails" cellpadding="0" cellspacing="0" style="width:100%!important" class="table dispaly table-bordered dataTable no-footer">
+            <thead>
+                <tr style="text-align: center;">
+                    <th style="text-align: center;" class="green" data-translate="Sl no">Serial.No</th>
+                    <th style="text-align: center;" class="green" data-translate="Sl no">Issue ID</th>
+                    <th style="text-align: center;" class="green" data-translate="Box Number">Issue Number</th>
+                    <th style="text-align: center;" class="green" data-translate="Box Number">Issue Dates</th>
+                    <th style="text-align: center;" class="green" data-translate="Box Number">Action</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+}
+<script type="text/javascript">
+    $("#btnnew").click(function () {
+        window.location.href = "../IssueLabel/IssueLabel";
+    });
+
+    $("#txtIssueDate").datepicker({
+        dateFormat: "dd-M-yy",
+        maxDate: 0,
+        changeMonth: true,
+        changeYear: true,
+        defaultDate: new Date(),
+        onSelect: function (evnt) {
+            $(this).tooltip("dispose");
+        }
+    });
+    $("#txtIssueDate").datepicker("setDate", new Date());
+
+    $(document).ready(function () {
+        $('#GridIssueLabelDetails').DataTable({
+            "ajax": {
+                "url": "../IssueLabel/GetAllIssueDetails",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": null, "defaultContent": "", "orderable": true, "class": "dt-center","visible":true},
+                { "data": 'IssueId', "autoWidth": true, "visible": false },
+                { "data": 'IssueNumber', "autoWidth": true },
+                {
+                    "data": 'IssueDate', "autoWidth": true,
+                    render: function (data) {
+                        return moment(data).format('DD-MMM-yy');
+                    }
+                },
+                {
+                    "data": "View", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        return '<a title="Click here to Edit" href="javascript:editDetailsId(\'' + row.IssueId + '\')" ><i class="fa fa-eye" style="font - size: 16px"></i></a>';
+                    }
+                },
+            ], 
+            "columnDefs": [
+                {
+                    "targets": 0,
+                    "data": null,
+                    "render": function (data, type, row, meta) {
+                        return meta.row + 1;
+                    }
+                }
+            ]
+        });
+    });
+    function editDetailsId(IssueId) {
+        window.location.href = "../IssueLabel/GetIssueDetailsById?IssueId=" + IssueId;
+    }
+</script>
+
+

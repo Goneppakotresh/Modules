@@ -1,0 +1,271 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.ReceiveHologramDispatch
+
+@{
+    ViewBag.Title = "ReceiveHologramDispatchCreation";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Receiving of Security Holograms </span>
+                <button type="button" class="btn btn-primary pull-right" id="btnBack" data-translate="Back">
+                    <i class="fa fa-plus"></i> Back
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="row">
+        <div class="row">
+            <div class="col-md-4">
+                <label><b>GENERAL DETAIL</b></label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label  class="mandatory" data-translate="Deo">PurchaseOrder Number<span style="color:red"></span></label>
+                    @Html.DropDownListFor(m => m.ReferenceId, ViewBag.PurchaseOrderList as List<SelectListItem>, "Select", new
+               {
+                   @class = "form-control js-example-basic-single",
+                   id = "ddlPurchasenum",
+                   onchange = "GetPODetails()"
+               })
+                    @Html.ValidationMessageFor(m => m.ReferenceId, "", new { @class = "text-danger", id = "dspPurchaseNum" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="To Date" class="control-label" data-translate="To Date">
+                    Purchase Date
+                </label>
+                @Html.TextBoxFor(m => m.ReceivedDate, new
+           {
+               @maxlength = "12",
+               @class = "form-control datepicker",
+               autocomplete = "off",
+               id = "txtPurchasedate",
+               placeholder = "DD-MM-YYYY",
+               disabled = "disabled"
+           })
+                @Html.ValidationMessageFor(m => m.ReceivedDate, "", new { @class = "text-danger", id = "dspPurchaseDate" })
+            </div>
+            <div class="col-md-3 form-group">
+                <label for="Supplier" class="control-label" data-translate="Supplier">
+                    Supplier
+                </label>
+                @Html.TextBoxFor(m => m.Supplier, new
+           {
+               @maxlength = "100",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtSupplier",
+               Readonly = "true"
+           })
+                @Html.ValidationMessageFor(m => m.Supplier, "", new { @class = "text-danger", id = "dspSupplier" })
+            </div>
+            <div class="col-md-3 form-group">
+                <label for="RequestQuantity" class="control-label" data-translate="RequestQuantity">
+                    Request Hologram Quantity
+                </label>
+                @Html.TextBoxFor(m => m.RequestQuantity, new
+           {
+               @maxlength = "100",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtRequestqty",
+               Readonly = "true"
+           })
+                @Html.ValidationMessageFor(m => m.RequestQuantity, "", new { @class = "text-danger", id = "dspRequestQuantity" })
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 form-group">
+                <label for="Dispatch Hologram Quantity" class="control-label" data-translate="DispatchQuantty">
+                    Dispatch Hologram Quantity
+                </label>
+                @Html.TextBoxFor(m => m.DispatchQuantity, new
+           {
+               @maxlength = "100",
+               @class = "form-control",
+               autocomplete = "off",
+               id = "txtDispatchqty",
+               Readonly = "true"
+           })
+                @Html.ValidationMessageFor(m => m.DispatchQuantity, "", new { @class = "text-danger", id = "dspDispatchQuantty" })
+            </div>
+            <div class="col-md-3 form-group">
+                <label for="ReceivedQuantty" class="control-label mandatory" data-translate="ReceivedQuantity">
+                    Received Hologram Quantity
+                </label>
+                @Html.TextBoxFor(m => m.ReceivedQuantity, new
+           {
+               @maxlength = "50",
+               @class = "form-control numbers",
+               autocomplete = "off",
+               id = "txtReceivedqty"
+           })
+                @Html.ValidationMessageFor(m => m.ReceivedQuantity, "", new { @class = "text-danger", id = "dspReceivedQuantity" })
+            </div>
+            <div class="col-md-3 form-group">
+                <label for="BalanceQuantty" class="control-label mandatory" data-translate="BalanceQuantty">
+                    Balance Quantity
+                </label>
+                @Html.TextBoxFor(m => m.BalanceQuantity, new
+           {
+               @maxlength = "100",
+               @class = "form-control numbers",
+               autocomplete = "off",
+               id = "txtBalanceqty",
+               @readonly="true"
+           })
+                @Html.ValidationMessageFor(m => m.BalanceQuantity, "", new { @class = "text-danger", id = "dspBalanceQuantty" })
+            </div>
+        </div>
+    </div>
+    <div class="text-center">
+        <button type="submit" id="btnSave" class="btn btn-success" data-translate="Save">Save</button>
+        <button type="button" id="btnReset" class="btn btn-danger" data-translate="Cancel">Reset</button>
+        <button type="button" id="printreport" class="btn btn-primary" data-translate="printreport" style="display: none;">Print report</button>
+    </div>
+}
+@if (Model.ResponseCode >= 200&& Model.ResponseCode <= 299)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Receive Details has been Saved Successfully",
+                type: "Success"
+            }).then(function () {
+                window.location.href = "../ReceiveHologramDispatch/ReceiveHologramDispatch";
+            });
+        });
+    </script>
+}
+@if (Model.ResponseCode >= 400 && Model.ResponseCode <= 500)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Something Went wrong:404",
+                type: "Success"
+            }).then(function () {
+                window.location.href = "../ReceiveHologramDispatch/ReceiveHologramDispatch";
+            });
+        });
+    </script>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+       
+       
+        if ($('#txtReceivedqty').val() != 0) {
+            debugger;
+            $("#btnReset").hide();
+            $("#btnSave").hide();
+            $("#txtPurchasedate").attr("disabled", true);
+            $("#ddlPurchasenum").prop("disabled", true);
+            $("#txtReceivedqty").prop("disabled", true);
+            $("#txtBalanceqty").prop("disabled", true);
+            $("#printreport").show();
+            GetPODetails();
+
+        }
+        $('#txtReceivedqty').on('input', function () {
+            var dispatchQty = parseFloat($('#txtDispatchqty').val()) || 0;
+            var receivedQty = parseFloat($('#txtReceivedqty').val()) || 0;
+            var balanceQty = dispatchQty - receivedQty;
+
+            $('#txtBalanceqty').val(balanceQty);
+        });
+
+        $("#btnSave").click(function () {
+            debugger;
+            if ($('#ddlPurchasenum').val() == 0 || $('#ddlPurchasenum').val() == "" || $('#ddlPurchasenum').val() == null) {
+                $('#dspPurchaseNum').html("Please Select purchase number");
+                $('#dspPurchaseNum').focus();
+                return false;
+            }
+            else {
+                $('#dspPurchaseNum').html("");
+            }
+            if ($('#txtReceivedqty').val() == "") {
+                $('#dspReceivedQuantity').html("Please Enter Received Quantity");
+                $('#txtReceivedqty').focus();
+                return false;
+            }
+            else {
+                $('#dspReceivedQuantity').html("");
+            }
+            var receiveqty = $('#txtReceivedqty').val();
+            var dispatchqty = $('#txtDispatchqty').val();
+            if (receiveqty > dispatchqty) {
+                alert("Receive quantity should be less than receive quantity.");
+                return false;
+            }
+            if ($('#txtBalanceqty').val() == "" || $('#txtBalanceqty').val() == "0" || $('#txtBalanceqty').val() == null) {
+                $('#dspBalanceQuantty').html("Please Enter Balance Quantity");
+                $('#txtBalanceqty').focus();
+                return false;
+            }
+            else {
+                $('#dspReceivedQuantity').html("");
+            }
+        });
+        $('#btnReset').click(function () {
+            window.location.href = "../ReceiveHologramDispatch/ReceiveHologramDispatchCreation";
+        });
+        $('#btnBack').click(function () {
+            window.location.href = "../ReceiveHologramDispatch/ReceiveHologramDispatch";
+        });
+    });
+    function GetPODetails() {
+
+        var purchaseOrderId = $("#ddlPurchasenum").val();
+        $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: "../ReceiveHologramDispatch/GetPurchaseOrderDetails",
+            data: { "purchaseOrderId": purchaseOrderId },
+            async: false,
+            dataType: 'json',
+            success: function (data) {
+                debugger
+                if (data) {
+                    $('#txtRequestqty').val(data.RequestQuantity);
+                    $('#txtSupplier').val(data.Supplier);
+                    var purchaseDate = data.PurchaseOrderDate;
+                    var dateWithoutTime = purchaseDate.split('T')[0];
+                    var formattedDate = formatDate(dateWithoutTime);
+                    $('#txtPurchasedate').val(formattedDate);
+                    $("#ddlPurchasenum").prop("disabled", true);                   
+                }
+            }
+        });
+    }
+
+    function formatDate(dateString) {
+        debugger;
+        var parts = dateString.split('-');
+        var day = parseInt(parts[2], 10);  
+        var month = parseInt(parts[1], 10) - 1;  
+        var year = parseInt(parts[0], 10);
+        var formattedDate = new Date(year, month, day);
+
+        var options = { day: '2-digit', month: 'short', year: 'numeric' };
+        return formattedDate.toLocaleDateString('en-IN', options).toUpperCase();
+    }
+    $('#printreport').click(function () {
+        window.location.href = "../ReceiveHologramDispatch/PrintReceiveHologramDetails?purchaseOrderId=" +@Model.ReferenceId;
+    });
+</script>
+
+
+

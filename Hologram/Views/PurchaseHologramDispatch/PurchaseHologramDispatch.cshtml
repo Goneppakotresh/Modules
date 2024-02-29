@@ -1,0 +1,347 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.PurchaseHologramDispatch
+@{
+    ViewBag.Title = "PurchaseHologram";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>PURCHASE HOLOGRAM DISPATCH ENTRY </span>
+                <button type="button" class="btn btn-primary pull-right" id="btnBack" data-translate="Back">
+                    <i class="fa fa-plus"></i> Back
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="row">
+        <div class="row">
+            <div class="col-md-4">
+                <label><b>GENERAL DETAIL</b></label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label data-translate="">Purchase Order No.<span style="color:red">*</span></label>
+                    @Html.DropDownListFor(m => m.ReferenceId, ViewBag.PurchaseOrderList as List<SelectListItem>, "Select", new
+                {
+                @class = "form-control js-example-basic-single",
+                id = "ddlPonum",
+                onchange = "GetPODetails()"
+                })
+
+                    @Html.ValidationMessageFor(m => m.ReferenceId, "", new { @class = "text-danger", id = "dspPoNo" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="To Date" class="control-label" data-translate="">
+                    Request Date
+                </label>
+                @Html.TextBoxFor(m => m.RequestDate, new
+            {
+            @maxlength = "12",
+            @class = "form-control",
+            autocomplete = "off",
+            id = "txtRequestDate",
+            placeholder = "DD-MM-YYYY",
+            disabled = true
+            })
+                @Html.ValidationMessageFor(m => m.RequestDate, "", new { @class = "text-danger", id = "dspRequestDate" })
+            </div>
+            <div class="col-md-3 form-group">
+                <label for="Supplier" class="control-label" data-translate="">
+                    Request Quantity
+                </label>
+                @Html.TextBoxFor(m => m.RequestQuantity, new
+            {
+            @maxlength = "100",
+            @class = "form-control",
+            autocomplete = "off",
+            id = "txtRequestQty",
+            Readonly = "true"
+            })
+                @Html.ValidationMessageFor(m => m.RequestQuantity, "", new { @class = "text-danger", id = "dspRequestQty" })
+            </div>
+            <div class="col-md-3 form-group">
+                <label for="Request Quantity" class="control-label" data-translate="">
+                    Pending Quantity
+                </label>
+                @Html.TextBoxFor(m => m.PendingQuantity, new
+            {
+            @maxlength = "100",
+            @class = "form-control",
+            autocomplete = "off",
+            id = "txtPendingqty",
+            Readonly = "true"
+            })
+                @Html.ValidationMessageFor(m => m.PendingQuantity, "", new { @class = "text-danger", id = "dspPendingQty" })
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3" id="hideDispatchNo">
+                <div class="form-group">
+                    <label data-translate="Dispatch Number">Dispatch Number<span style="color:red">*</span></label>
+                    @Html.EditorFor(model => model.DispatchNumber, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly", id = "txtDispatchNumber", @placeholder = "Auto Generated", @maxlength = "50" } })
+                </div>
+            </div>
+            <div class="col-md-3 form-group">
+                <label for="Dispatch Quantity" class="control-label mandatory" data-translate="">
+                    Dispatch Quantity<span style="color:red">*</span>
+                </label>
+                @Html.TextBoxFor(m => m.DispatchQuantity, new
+            {
+            @maxlength = "20",
+            @class = "form-control numbers",
+            autocomplete = "off",
+            id = "txtDispatchqty"
+            })
+                @Html.ValidationMessageFor(m => m.DispatchQuantity, "", new { @class = "text-danger", id = "dspDispatchQuantty" })
+            </div>
+            <div class="col-md-3">
+                <label for="To Date" class="control-label mandatory" data-translate="">
+                    Dispatch Date
+                </label>
+                @Html.TextBoxFor(m => m.DispatchDate, new
+            {
+            @class = "form-control datepicker",
+            id = "txtDispatchdate",
+            placeholder = "DD-MM-YYYY",
+            @readonly = "readonly"
+            })
+                @Html.ValidationMessageFor(m => m.DispatchDate, "", new { @class = "text-danger", id = "dspDispatchDate" })
+            </div>
+            <div class="col-md-3">
+                <label data-translate="">Issue Number<span style="color:red">*</span></label>
+                @Html.DropDownListFor(m => m.IssueId, ViewBag.IssueLabeList as List<SelectListItem>, "Select", new
+            {
+            @class = "form-control js-example-basic-single",
+            id = "ddlIssue",
+            onchange = "GetPODetails()"
+            })
+
+                @Html.ValidationMessageFor(m => m.ReferenceId, "", new { @class = "text-danger", id = "dspIssue" })
+            </div>
+        </div>
+        @*<table id="myTable" class="table display table-bordered dataTable no-footer dtr-inline.">
+    <tr>
+    <th data-translate="slno">SL NO</th>
+    <th data-translate="box">BOX NUMBER</th>
+    </tr>
+    @for (var i = 0; i < Model.issueLabelDetails.Count(); i++)
+    {
+    <tr class="data-row">
+    <td>
+    @Html.TextBoxFor(model => model.issueLabelDetails[i].Slno, new
+    {
+    @class = "slno form-control numbers",
+    @style = "text-align:right!important",
+    id = "txtslno",
+    @onkeypress = "return numbersonly(event,this)",
+    @maxlength = "10",
+    @value = "1"
+    })
+    </td>
+    <td>
+    @Html.TextBoxFor(model => model.issueLabelDetails[i].CaseNumber, new
+    {
+    @class = "BoxNumber form-control numbers",
+    @style = "text-align:right!important",
+    id = "txtBoxNumber",
+    @maxlength = "14",
+    placeholder = "Scan Box Number"
+
+    })
+    </td>
+    </tr>
+    }
+    </table>*@
+    </div>
+    <div class="text-center">
+        <button type="submit" id="btnSave" class="btn btn-success" data-translate="Save">Save</button>
+        <button type="button" id="btnReset" class="btn btn-danger" data-translate="Cancel">Reset</button>
+    </div>
+}
+
+@if (Model.ResponseCode >= 200 && Model.ResponseCode <= 299)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Dispatch Details has been Saved Successfully with Dispatch No. " + @Model.DispatchNumber,
+                type: "Success"
+            }).then(function () {
+                window.location.href = "../PurchaseHologramDispatch/PurchaseHologramDispatchView";
+            });
+        });
+    </script>
+}
+@if (Model.ResponseCode >= 400 && Model.ResponseCode <= 499)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Something Went Wrong: 404",
+                type: "error"
+            }).then(function () {
+                window.location.href = "../PurchaseHologramDispatch/PurchaseHologramDispatchView";
+            });
+        });
+    </script>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        if ('@Model.ReferenceId' != "0") {
+            debugger;
+            $('#txtDispatchdate').attr("disabled", true);
+            $('#txtDispatchqty').attr("disabled", true);
+            $('#ddlPonum').prop("disabled", true).trigger("chosen:updated");
+            $('#btnSave').hide();
+            $('#btnReset').hide();
+            $('#txtDispatchqty').trigger("change");
+            $('#hideDispatchNo').show();
+            var dispatchDate = $('#txtDispatchdate').val();
+            var dateWithoutTime = dispatchDate.split(' ')[0];
+            var formattingDate = formatDate(dateWithoutTime);
+            $('#txtDispatchdate').val(formattingDate);
+        } else {
+            $('#hideDispatchNo').hide();
+        }
+        $('#btnnew').click(function () {
+            window.location.href = "../PurchaseHologramDispatch/PurchaseHologramDispatchView";
+        });
+        $('#btnSave').click(function () {
+            debugger
+            var isValidate = true;
+            var ddlPo = $('#ddlPonum').val();
+            var disQty = $('#txtDispatchqty').val();
+            var disDate = $('#txtDispatchdate').val();
+            var ddlissueNumber = $('#ddlIssue').val();
+
+            if (ddlPo == "0" || ddlPo == "") {
+                $('#dspPoNo').html("Please select Purchase Order Number");
+                $('#ddlPonum').focus();
+                isValidate = false;
+                return false;
+            } else {
+                $('#dspPoNo').html("");
+            }
+            if (disQty == "" || disQty == "0") {
+                $('#dspDispatchQuantty').html("Please Enter Dispatch Quantity");
+                $('#dspDispatchQuantty').focus();
+                isValidate = false;
+                return false;
+            } else {
+                $('#dspDispatchQuantty').html("");
+            }
+            if (disDate == "") {
+                $('#dspDispatchDate').html("Please select Dispatch Date");
+                $('#dspDispatchDate').focus();
+                isValidate = false;
+                return false;
+            } else {
+                $('#dspDispatchDate').html("");
+            }
+            if (ddlissueNumber == "0" || ddlissueNumber == "") {
+                $('#dspIssue').html("Please select Issue Number");
+                $('#issueNumber').focus();
+                isValidate = false;
+                return false;
+            } else {
+                $('#dspIssue').html("");
+            }
+
+            if (isValidate == false) {
+                return false;
+            }
+            var poqty = parseInt($('#txtRequestQty').val());
+            var dispatchqty = parseInt($('#txtDispatchqty').val());
+            if (dispatchqty > poqty) {
+                alert("dispatch qty should be less than Purchase Order Quantity")
+                return false;
+            }
+        });
+
+        $('#txtDispatchqty').on('input', function () {
+            var dispatchqty = parseInt($(this).val()) || 0;
+            var reqqty = parseInt($('#txtRequestQty').val());
+            if (reqqty == "") {
+                reqqty = 0;
+            }
+            if (dispatchqty == "") {
+                dispatchqty = 0;
+            }
+            var formattedQty = reqqty - dispatchqty;
+            var formattedQtyString = formattedQty.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            $('#txtPendingqty').val(formattedQtyString);
+        });
+
+        $('#btnReset').click(function () {
+            window.location.href = "../PurchaseHologramDispatch/PurchaseHologramDispatch";
+        });
+        $("#txtRequestDate").datepicker("setDate", new Date());
+        $("#txtRequestDate").datepicker({
+            dateFormat: "dd-M-yy",
+            maxDate: 0,
+            changeMonth: true,
+            changeYear: true,
+            defaultDate: new Date(),
+            onSelect: function (evnt) {
+                $(this).tooltip("dispose");
+            }
+        });
+        $('#btnBack').click(function () {
+            window.location.href = "../PurchaseHologramDispatch/PurchaseHologramDispatchView";
+        });
+    });
+
+
+
+
+    function GetPODetails() {
+        debugger
+        var purchaseOrderId = $("#ddlPonum").val();
+        $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: "../ReceiveHologramDispatch/GetPurchaseOrderDetails",
+            data: { "purchaseOrderId": purchaseOrderId },
+
+            async: false,
+            dataType: 'json',
+            success: function (data) {
+                debugger
+                if (data) {
+                    $('#txtRequestQty').val(data.RequestQuantity);
+                    var formattedDate = formatDate(data.PurchaseOrderDate);
+                    var dateWithoutTime = formattedDate.split(' ')[0];
+                    var formattingDate = formatDate(dateWithoutTime);
+                    $('#txtRequestDate').val(formattedDate);
+                }
+            }
+        });
+    }
+    function parseJsonDate(jsonDateString) {
+        return new Date(parseInt(jsonDateString.replace('/Date(', '')));
+    }
+
+    function formatDate(dateString) {
+        debugger;
+        var parts = dateString.split('-');
+        var day = parseInt(parts[0], 10);
+        var month = parseInt(parts[1], 10) - 1;
+        var year = parseInt(parts[2], 10);
+        var formattedDate = new Date(year, month, day);
+
+        var options = { day: '2-digit', month: 'short', year: 'numeric' };
+        return formattedDate.toLocaleDateString('en-IN', options).toUpperCase();
+    }
+</script>

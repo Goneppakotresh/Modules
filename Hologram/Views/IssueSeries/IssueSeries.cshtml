@@ -1,0 +1,95 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.IssueSeries
+
+@{
+    ViewBag.Title = "IssueSeries";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Issue Series </span>
+                @*<button type="button" class="btn btn-success pull-right" id="btnnew" data-translate="Create">
+                        <i class="fa fa-plus"></i> Create
+                    </button>*@
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="container-fluid">
+        <table id="GridIssueSeriesDetails" cellpadding="0" cellspacing="0" style="width:100%!important" class="table dispaly">
+            <thead>
+                <tr style="text-align: center;">
+                    <th style="text-align: center;" class="green" data-translate="Shop Id">print req id</th>
+                    <th style="text-align: center;" class="green" data-translate="Shop Id">Print Request Date</th>
+                    <th style="text-align: center;" class="green" data-translate="Shop Code">Print Request Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Shop Name">Print Request Number</th>
+                    <th style="text-align: center;" class="green" data-translate="Deo Name">Print Request Box Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Deo Id">Status</th>
+                    <th style="text-align: center;" class="green" data-translate="Circle Name">Action</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#btnnew').click(function () {
+            var url = '@Url.Action("IssueSeriesCreation", "IssueSeries")';
+            window.location.href = url;
+        });
+        $('#GridIssueSeriesDetails').DataTable({
+            "ajax": {
+                "url": "../IssueSeries/GetAllIssueSeriesListDetails",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": 'HologramPrintingRequestId', "autoWidth": true, "visible": false },
+                {
+                    "data": 'RequestDate', "autoWidth": true,
+                    render: function (data) {
+                        // Format date using moment.js
+                        return moment(data).format('DD-MMM-yy');
+                    }    },
+                { "data": 'RequestQuantity', "autoWidth": true },
+                { "data": 'RequestNumber', "autoWidth": true },
+                { "data": 'BoxQuantity', "autoWidth": true },
+                {
+                    "data": "Status", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        //return '<a  href="javascript:EditClick(\'' + row.HologramPrintingRequestId + '\', \'E\')" title = "View" > <i class="fa fa-eye" style="font-size:16px"></i></a > ';
+                        if (data == 2) {
+                            return '<label for="Allocated" class="control-label"><b>Allocated</b></label>';
+                        } else {
+                            return '<label for="Allocated" class="control-label"><b>Allocation Pending</b></label>';
+                        }
+                    }
+                },
+                {
+                    "data": "Status", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        if (data==2) {
+                            return '<a title="Click here to Edit" href="javascript:EditClick(\'' + row.HologramPrintingRequestId + '\', \'V\')"><i class="fa fa-eye" style="font-size: 16px"></i></a>';
+                        } else {
+                            return '<a title="Click here to Edit" href="javascript:EditClick(\'' + row.HologramPrintingRequestId + '\', \'V\')"><i class="fa fa-edit" style="font-size: 16px"></i></a>';
+                        }
+                    }
+                },
+            ]
+        });
+
+    });
+    function EditClick(HologramPurchaseOrderId) {
+        window.location.href = "../IssueSeries/IssueSeriesById?id=" + HologramPurchaseOrderId;
+    }
+
+</script>
+
+

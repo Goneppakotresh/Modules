@@ -1,0 +1,145 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.ReceiveHologramDispatch
+
+@{
+    ViewBag.Title = "ReceiveHologramDispatch";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    table#GridHologramDispatchDetails tr td:nth-child(1) {
+        text-align: right !important
+    }
+    table#GridHologramDispatchDetails tr td:nth-child(2) {
+        text-align: right !important
+    }
+    table#GridHologramDispatchDetails tr td:nth-child(3) {
+        text-align: right !important
+    }
+    table#GridHologramDispatchDetails tr td:nth-child(4) {
+        text-align: right !important
+    }
+</style>
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Receive Hologram Dispatch List </span>
+                @*<button type="button" class="btn btn-success pull-right" id="btnnew" data-translate="Create">
+                    <i class="fa fa-plus"></i> Create
+                </button>*@
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="container-fluid">
+        <table id="GridHologramDispatchDetails" style="width:100%!important" class="table dispaly table-bordered dataTable no-footer">
+            <thead>
+                <tr style="text-align: center;">
+                    <th style="text-align: center;" class="green" data-translate="Serial.No">Serial.No</th>
+                    <th style="text-align: center;" class="green" data-translate="Order Number">Purchase Order Number</th>
+                    <th style="text-align: center;" class="green" data-translate="Order Number">Dispatch Number</th>
+                    <th style="text-align: center;" class="green" data-translate="Request Quantity">Request Hologram Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Dispatch Quantity">Dispatch Hologram Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Received Quantity">Received Hologram Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Balance Quantity">Balance Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Status">Status</th>
+                    <th style="text-align: center;" class="green" data-translate="Action">Action</th>         
+                </tr>
+            </thead>
+        </table>
+    </div>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('#btnnew').click(function () {
+            var url = '@Url.Action("ReceiveHologramDispatchCreation", "ReceiveHologramDispatch")';
+            window.location.href = url;
+        });
+        $('#GridHologramDispatchDetails').DataTable({
+            "ajax": {
+                "url": "../ReceiveHologramDispatch/GetAllHologramDispatchDetails",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": null, "defaultContent": "", "orderable": true, "class": "dt-center" },
+                { "data": 'ReferenceId', "autoWidth": true, "visible": false },
+                { "data": 'DispatchNumber', "autoWidth": true },
+                { "data": 'RequestQuantity', "autoWidth": true },
+                { "data": 'DispatchQuantity', "autoWidth": true },
+                { "data": 'ReceivedQuantity', "autoWidth": true },
+                { "data": 'BalanceQuantity', "autoWidth": true },
+                {
+                    "data": "ReferenceId", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        if (row.ReceivedQuantity > 0) {
+                            return '<label for="Submitted" class="control-label"><b>Submitted</b></label>';
+                        } else {
+                            return '<label for="Submitted" class="control-label"><b>Pending</b></label>';
+                        }
+                        //return '<a  href="javascript:ViewClick(\'' + row.ReferenceId + '\', \'E\')" title = "View" > <i class="fa fa-eye" style="font-size:16px"></i></a > ';
+                    }
+                },
+                {
+                    "data": "ReferenceId", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        if (row.ReceivedQuantity > 0) {
+                            return '<a  href="javascript:ViewClick(\'' + row.ReferenceId + '\', \'E\')" title = "View" > <i class="fa fa-eye" style="font-size:16px"></i></a > ';
+                        } else {
+                            return '<a title="Click here to Edit" href="javascript:EditClick(\'' + row.ReferenceId + '\', \'V\')"><i class="fa fa-edit" style="font-size: 16px"></i></a>';
+                        }
+                    }
+                }             
+            ],
+                 "columnDefs": [
+                {
+                    "targets": 0, // Target the first column (Serial Number)
+                    "data": null,
+                    "render": function (data, type, row, meta) {
+                        // Use meta.row to get the current row index and add 1 to start from 1
+                        return meta.row + 1;
+                    }
+                }
+            ]
+        });
+
+    });
+
+    function ViewClick(ReferenceId) {
+
+ $.ajax({
+  url: '@Url.Action("ReceiveHologramDispatchById", "ReceiveHologramDispatch")',
+  type: 'GET',
+     data: { id: ReferenceId },
+  dataType: 'json',
+     success: function (data) {
+         sessionStorage.setItem('ref', 1);
+      document.location.href = "../ReceiveHologramDispatch/ReceiveHologramDispatchCreation";
+  },
+  error: function () {
+
+     }
+  });
+    }
+
+    function EditClick(ReferenceId) {
+
+ $.ajax({
+  url: '@Url.Action("ReceiveHologramDispatchById", "ReceiveHologramDispatch")',
+  type: 'GET',
+     data: { id: ReferenceId },
+  dataType: 'json',
+     success: function (data) {
+         sessionStorage.setItem('RefrenceId', -1);
+      document.location.href = "../ReceiveHologramDispatch/ReceiveHologramDispatchCreation";
+  },
+  error: function () {
+
+     }
+  });
+}
+
+</script>

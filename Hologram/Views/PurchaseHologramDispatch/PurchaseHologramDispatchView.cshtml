@@ -1,0 +1,134 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.PurchaseHologramDispatch
+@{
+    ViewBag.Title = "PurchaseHologramView";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+<style>
+    table#GridHologramDispatchDetails tr td:nth-child(2) {
+        text-align: right !important
+    }
+
+    table#GridHologramDispatchDetails tr td:nth-child(3) {
+        text-align: right !important
+    }
+</style>
+
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>PURCHASE HOLOGRAM DISPATCH LIST </span>
+                <button type="button" class="btn btn-success pull-right" id="btnnew" data-translate="Create">
+                    <i class="fa fa-plus"></i> Create
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="container-fluid">
+        <table id="GridHologramDispatchDetails" cellpadding="0" cellspacing="0" style="width:100%!important" class="table dispaly table-bordered dataTable no-footer">
+            <thead>
+                <tr style="text-align: center;">
+                    <th style="text-align: center;" class="green" data-translate="Serial.No">Serial.No</th>
+                    <th style="text-align: center;" class="green" data-translate="Order Number">Purchase No.</th>
+                    <th style="text-align: center;" class="green" data-translate="Order Number">Dispatch Number</th>
+                    <th style="text-align: center;" class="green" data-translate="Request Quantity">Dispatch Date</th>
+                    <th style="text-align: center;" class="green" data-translate="Dispath Quantity">Purchase Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Received Quantity">Dispatch Quantity</th>
+                    <th style="text-align: center;" class="green" data-translate="Status">Status</th>
+                    <th style="text-align: center;" class="green" data-translate="Action">Action</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('#GridHologramDispatchDetails').DataTable({
+            "ajax": {
+                "url": "../PurchaseHologramDispatch/GetAllHologramDispatchDetails",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": null, "defaultContent": "", "orderable": true, "class": "dt-center" },
+                { "data": 'ReferenceId', "autoWidth": true,"visible":false },
+                { "data": 'DispatchNumber', "autoWidth": true},
+                {
+                    "data": 'DispatchDate', "autoWidth": true,
+                    render: function (data) {
+                        // Format date using moment.js
+                        return moment(data).format('DD-MMM-yy');
+                    }    },
+                { "data": 'PendingQuantity', "autoWidth": true },
+                { "data": 'DispatchQuantity', "autoWidth": true },
+                {
+                    "data": "ReferenceId", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        //return '<a  href="javascript:ViewClick(\'' + row.ReferenceId + '\', \'E\')" title = "View" > <i class="fa fa-eye" style="font-size:16px"></i></a > ';
+                        return '<label for="Submitted" class="control-label"><b>Submitted</b></label>';
+                    }
+                },
+                {
+                    "data": "ReferenceId", "autoWidth": true, "sortable": false, "render": function (data, type, row) {
+                        return '<a title="Click here to Edit" href="javascript:EditClick(\'' + row.ReferenceId + '\', \'V\')"><i class="fa fa-eye" style="font-size: 16px"></i></a>';
+                    }
+                }
+            ],
+            "columnDefs": [
+                {
+                    "targets": 0, // Target the first column (Serial Number)
+                    "data": null,
+                    "render": function (data, type, row, meta) {
+                        // Use meta.row to get the current row index and add 1 to start from 1
+                        return meta.row + 1;
+                    }
+                }
+            ]
+        });
+
+    });
+    $('#btnnew').click(function () {
+        window.location.href = "../PurchaseHologramDispatch/PurchaseHologramDispatch";
+    });
+
+    function ViewClick(ReferenceId) {
+ $.ajax({
+  url: '@Url.Action("PurchaseHologramDispatchById", "PurchaseHologramDispatch")',
+  type: 'GET',
+     data: { id: ReferenceId },
+  dataType: 'json',
+     success: function (data) {
+         sessionStorage.setItem('ref', 1);
+         document.location.href = "../PurchaseHologramDispatch/PurchaseHologramDispatch";
+  },
+  error: function () {
+
+     }
+  });
+    }
+
+    function EditClick(ReferenceId) {
+
+ $.ajax({
+  url: '@Url.Action("PurchaseHologramDispatchById", "PurchaseHologramDispatch")',
+  type: 'GET',
+     data: { id: ReferenceId },
+  dataType: 'json',
+     success: function (data) {
+         sessionStorage.setItem('RefrenceId', -1);
+         document.location.href = "../PurchaseHologramDispatch/PurchaseHologramDispatch";
+  },
+  error: function () {
+
+     }
+  });
+}
+</script>

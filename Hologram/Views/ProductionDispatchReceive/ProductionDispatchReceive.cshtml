@@ -1,0 +1,281 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.ProductionDispatchReceiveModel
+
+@{
+    ViewBag.Title = "ProductionDispatchReceive";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Receive Label </span>
+                <button type="button" class="btn btn-success pull-right" id="btnBack" data-translate="Back">
+                    <i class="fa fa-plus"></i> Back
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.HiddenFor(model => model.DispatchId, new { id = "hdnDispatchId" })
+    <div class="row">
+        <div class="col-md-4">
+            <label><b>GENERAL DETAIL</b></label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <label for="RequestNumber" class="control-label" data-translate="RequestNumber">
+                Request Number
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.InvoiceNumber, new
+       {
+           @maxlength = "12",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtRequestnumber",
+           Readonly = true
+       })
+        </div>
+        <div class="col-md-3">
+            <label for="RequestDate" class="control-label" data-translate="RequestDate">
+                Request Date
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.DispatchDate, new
+       {
+           @maxlength = "12",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtRequestdate",
+           Readonly = true
+       })
+        </div>
+        <div class="col-md-3">
+            <label for="LabelQuantty" class="control-label" data-translate="LabelQuantty">
+                Label Quantity (in No.)
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.DispatchQuantity, new
+       {
+           @maxlength = "12",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtLabel",
+           Readonly = true
+       })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <label for="Box Quantity" class="control-label" data-translate="Box Quantity">
+                Box Quantity (in No.)
+            </label>
+
+
+            @Html.TextBoxFor(m => m.BoxQuantity, new
+       {
+           @maxlength = "12",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtBoxquantity",
+           Readonly = true
+       })
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-4">
+            <label><b>BOX DETAIL</b></label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="req_input" class="datainputs row">
+            <label for="BoxNumber" class="control-label mandatory" data-translate="BoxNumber">
+                Box Number
+            </label>
+            <div class="col-md-3 form-group">
+                @foreach (var dispatchDetail in Model.DispatchDetails)
+                {
+                    <div class="row">
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(m => dispatchDetail.CaseNumber, new
+                            {
+                                @maxlength = "100",
+                                @class = "form-control",
+                                autocomplete = "off",
+                                id = "txtBoxNumber",
+                                PlaceHolder = "Scan Box No.",
+                                @readonly = "readonly",
+                                value = dispatchDetail.CaseNumber
+                            })
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <button type="button" class="btn btn-sm btn-success btnLoad" data-translate="Load">GetDetails</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <div class="row">
+        <div class="col-md-4">
+            <label><b>Receive DETAIL</b></label>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-3">
+            <label for="DispatchOn" class="control-label" data-translate="DispatchOn">
+                Received On
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.ReceivedOn, new
+       {
+           @maxlength = "12",
+           @class = "form-control datepicker",
+           autocomplete = "off",
+           id = "txtDispatchon",
+           Readonly = true
+       })
+        </div>
+        <div class="col-md-3">
+            <label for="DispatchBy" class="control-label" data-translate="DispatchBy">
+                Received By
+                <span class="air_mandatory" style="color: red"></span>
+            </label>
+            @Html.TextBoxFor(m => m.ReceivedBy, new
+       {
+           @maxlength = "12",
+           @class = "form-control",
+           autocomplete = "off",
+           id = "txtDispatchby"
+       })
+        </div>
+
+    </div>
+    <br />
+    <div class="text-center">
+        <button type="submit" id="btnSave" class="btn btn-success" data-translate="Save">Save</button>
+        @*<button type="submit" id="btnSubmit" class="btn btn-secondary-gradien" data-translate="Submit">Submit</button>*@
+        <button type="button" id="btnCancel" class="btn btn-danger" data-translate="Cancel">Cancel</button>
+    </div>
+}
+@if (Model.ResponseCode >= 200&&Model.ResponseCode <= 299)
+{
+<script type="text/javascript">
+    $(document).ready(function () {
+        swal({
+            title: '',
+            text: "Production Dispatch Receive Details Saved Successfully",
+            type: "Success"
+        }).then(function () {
+            window.location.href = "../ProductionDispatchReceive/ProductionDispatchReceiveView";
+        });
+    });
+</script>
+}
+@if (Model.ResponseCode >= 400 && Model.ResponseCode <= 500)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Something Went Wrong: 404",
+                type: "error"
+            }).then(function () {
+                window.location.href = "../ProductionDispatchReceive/ProductionDispatchReceiveView";
+            });
+        });
+    </script>
+}
+
+@if (Model.ViewStatus =="V")
+{
+    <script type="text/javascript">
+        debugger;
+        $(document).ready(function () {
+            $("#txtDispatchby").prop("disabled", true);
+            $("#btnSave").hide();
+            $("#btnCancel").hide();
+            $(".btnLoad").hide();
+
+
+        });
+    </script>
+}
+<script type="text/javascript">
+    //$("#btnBack").click(function () {
+    //    window.location.href = "../ProductionDispatch/ProductionDispatch";
+    //});
+    $('#btnBack').click(function () {
+        var url = '@Url.Action("ProductionDispatchReceiveView", "ProductionDispatchReceive")';
+         window.location.href = url;
+    });
+
+    $(document).ready(function () {
+    $("#addmore").click(function () {
+        $("#req_input").append('<div class="required_inp row"><div class="col-md-3"><input class="form-control" type="text" placeholder="Scan Box No"></div>' + '<div class="col-md-3"><button type="button" id="btnLoad" value="GetDetails" class="btn btn-sm btn-success" data-translate="Load">GetDetails</button>' + '<i style="margin-top:13px!important;margin-left:10px!important"   class="fa fa-minus inputRemove"></i></div></div>');
+    });
+    $('body').on('click', '.inputRemove', function () {
+        $('div.required_inp').remove()
+    });
+    });
+    $(document).ready(function () {
+        $("#btnSave").click(function () {
+            debugger;
+            var ReqNumber = $('#txtRequestnumber').val();
+            var ReqDate = $('#txtRequestdate').val();
+            var Supplier = $('#txtSupplier').val();
+            var label = $('#txtLabel').val();
+            var boxQnty = $('#txtBoxquantity').val();
+            var boxnum = $('#txtBoxNumber').val();
+            var dispNum = $('#txtDispatchnumber').val();
+            var dispon = $('#txtDispatchon').val();
+            var disptchby = $('#txtDispatchby').val();
+            var handover = $('#txtHandover').val();
+            var file = $('#fileUpload').val();
+            debugger;
+            $.ajax({
+                type: "POST",
+                url: "../ProductionDispatch/SaveProductionDispatchDetails",
+                dataType: "json",
+                data: {
+                    ReqNo: ReqNumber, ReqDte: ReqDate, Supplie: Supplier, lables: label,
+                    boxQntity: boxQnty, boxnumber: boxnum, displayNum: dispNum, displayon: dispon,
+                    dispatchby: disptchby, Handover: handover, filename: file
+                },
+                success: function (data) {
+                    if (data.Status == "1") {
+                        swal({
+                            title: '',
+                            text: 'Inserted succefull',
+                            type: "success"
+                        }).then(function () {
+                            window.location = "../ProctionDispatch/ProctionDispatch";
+                        });
+                    }
+                    else {
+                        swal({
+                            title: '',
+                            text: "Something Went Wrong....",
+                            type: "failed"
+                        })
+                    }
+                }
+            })
+        });
+
+    });
+
+</script>

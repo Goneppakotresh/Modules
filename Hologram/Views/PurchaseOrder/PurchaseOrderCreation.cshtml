@@ -1,0 +1,323 @@
+﻿@model IEMS_WEB.Areas.Hologram.Models.RequestModel.PurchaseOrder
+@{
+    ViewBag.Title = "PurchaseOrderCreation";
+}
+@{
+    ViewBag.Title = "PurchaseOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-title">
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <span>Purchase Order Security Hologram</span>
+                <button type="button" class="btn btn-primary pull-right" id="btnBack" data-translate="Back">
+                    <i class="fa fa-plus"></i> Back
+                </button>
+            </h3>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    @Html.HiddenFor(m => m.HologramPurchaseOrderId, new { id = "hdnPoId" })
+    <div class="row">
+        <div class="col-md-4">
+            <label><b>INVENTORY DETAILS</b></label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 form-group">
+            <label for="AvlStock" class="control-label mandatory" data-translate="AvlStock">
+                Total Available Stock<span style="color:red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.TotalAvailableQuantity, new
+        {
+        @maxlength = "15",
+        @class = "form-control numbers",
+        autocomplete = "off",
+        id = "txtAvlstock",
+        @readonly = "readonly"
+        })
+            @Html.ValidationMessageFor(m => m.TotalAvailableQuantity, "", new { @class = "text-danger", id = "dspAvlStock" })
+        </div>
+        <div class="col-md-3">
+            <label for="Consumption" class="control-label mandatory" data-translate="Consumption">
+                Last Month Consumption<span style="color:red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.LastMonthConsumption, new
+        {
+        @maxlength = "15",
+        @class = "form-control numbers",
+        autocomplete = "off",
+        id = "txtMonthConsumption",
+        @readonly = "readonly"
+        })
+            @Html.ValidationMessageFor(m => m.LastMonthConsumption, "", new { @class = "text-danger", id = "dspConsumtion" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <label><b>GENERAL DETAILS</b></label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 form-group">
+            <label for="PONumber" class="control-label mandatory" data-translate="PONumber">
+                Purchase Order Number <span style="color:red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.PurchaseOrderNumber, new
+        {
+        @maxlength = "30",
+        @class = "form-control",
+        autocomplete = "off",
+        id = "txtPurchasenum",
+        oninput = "this.value = this.value.replace(/[^a-zA-Z0-9]/g, ''); this.value = this.value.trim();"
+
+        })
+            @Html.ValidationMessageFor(m => m.PurchaseOrderNumber, "", new { @class = "text-danger", id = "dspPONumber" })
+        </div>
+        <div class="col-md-3">
+            <label for="Purchase Date" class="control-label mandatory" data-translate="PurchaseDate">
+                Purchase Order Date <span style="color:red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.PurchaseOrderDate, new
+        {
+        @maxlength = "12",
+        @class = "form-control datepicker",
+        autocomplete = "off",
+        id = "txtPurchasedate",
+        placeholder = "DD-MM-YYYY",
+        @readonly = "readonly"
+        })
+            @Html.ValidationMessageFor(m => m.PurchaseOrderDate, "", new { @class = "text-danger", id = "dspPurchaseDate" })
+        </div>
+        <div class="col-md-3 form-group">
+            <label for="Supplier" class="control-label mandatory" data-translate="Supplier">
+                Supplier Name<span style="color:red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.Supplier, new
+        {
+        @maxlength = "50",
+        @class = "form-control",
+        autocomplete = "off",
+        id = "txtSupplier",
+        oninput="this.value = this.value.replace(/[^a-zA-Z]+/g, ' ');"
+
+        })
+            @Html.ValidationMessageFor(m => m.Supplier, "", new { @class = "text-danger", id = "dspSupplier" })
+        </div>
+        <div class="col-md-3 form-group divBoxQty">
+            <label for="Quantity" class="control-label mandatory" data-translate="Quantity">
+                NO.Of Boxes<span style="color:red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.BoxQuantity, new
+        {
+        @maxlength = "15",
+        @class = "form-control",
+        autocomplete = "off",
+        id = "txtBoxQuantity",
+        // onchange = "return GetHologramQty(this.value)",
+        oninput="this.value = this.value.replace(/[^0-9]+/g, '').trim();"
+        })
+            @Html.ValidationMessageFor(m => m.RequestQuantity, "", new { @class = "text-danger", id = "dspQuantity" })
+        </div>
+        <div class="col-md-3 form-group">
+            <label for="Quantity" class="control-label mandatory" data-translate="Quantity">
+                Hologram Quantity<span style="color:red">*</span>
+            </label>
+            @Html.TextBoxFor(m => m.RequestQuantity, new
+        {
+        @maxlength = "15",
+        @class = "form-control",
+        autocomplete = "off",
+        id = "txtQuantity",
+        @readonly = "readonly"
+        })
+            @Html.ValidationMessageFor(m => m.RequestQuantity, "", new { @class = "text-danger", id = "dspQuantity" })
+        </div>
+    </div>
+
+
+    <br />
+    <div class="text-center">
+        <button type="submit" id="btnSave" class="btn btn-success" data-translate="Save">Save</button>
+        <button type="button" id="btnReset" class="btn btn-danger" data-translate="Reset">Reset</button>
+    </div>
+}
+@if (Model.ResponseCode >= 200 && Model.ResponseCode <= 299)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Purchase Order Number: @Model.PurchaseOrderNumber Details has been Saved Successfully",
+                type: "Success"
+            }).then(function () {
+                var url = '@Url.Action("PurchaseOrder", "PurchaseOrder")';
+                window.location.href = url;
+            });
+        });
+    </script>
+}
+@if (Model.ResponseCode >= 400 && Model.ResponseCode <= 499)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            swal({
+                title: '',
+                text: "Something Went Wrong: 404",
+                type: "Success"
+            }).then(function () {
+                var url = '@Url.Action("PurchaseOrder", "PurchaseOrder")';
+                window.location.href = url;
+            });
+        });
+    </script>
+}
+@if (Model.TotalAvailableQuantity == 0)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            debugger;
+            fetchTotalAvailandLastMonthConsumpt();
+        });
+    </script>
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        function convertindiancurrency(amt) {
+
+            var number = amt;
+            var parsedNum = parseFloat(number.replace(/,/g, ''));
+            // Check if the input is a valid number
+            if (!isNaN(parsedNum)) {
+                var indianNumber = parsedNum.toLocaleString('en-IN', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                return indianNumber;
+            }
+        }
+
+        if ($('#hdnPoId').val() != 0) {
+            debugger;
+            $('#txtPurchasenum').prop("disabled", true);
+            $('#txtPurchasedate').prop("disabled", true);
+            $('#txtQuantity').prop("disabled", true);
+            $('#txtSupplier').prop("disabled", true);
+            $('#txtMonthConsumption').prop("disabled", true);
+            $('#txtAvlstock').prop("disabled", true);
+            $('#btnReset').hide();
+            $('#btnSave').hide();
+            $('.divBoxQty').hide(); 
+            var purchaseDate = $('#txtPurchasedate').val();
+            var dateWithoutTime = purchaseDate.split(' ')[0];
+            var formattedDate = formatDate(dateWithoutTime);
+            $('#txtPurchasedate').val(formattedDate);
+        }
+        $('#btnBack').click(function () {
+            var url = '@Url.Action("PurchaseOrder", "PurchaseOrder")';
+            window.location.href = url;
+        });
+        $('#btnReset').click(function () {
+            var url = '@Url.Action("PurchaseOrderCreation", "PurchaseOrder")';
+            window.location.href = url;
+        });
+
+        $('#btnSave').click(function () {
+            debugger;
+            // $("#txtQuantity").val($("#txtQuantity").val().replace(/[\/,]/g, ""));
+            // $('#txtLabel').val($('#txtLabel').val().replace(/[\/,]/g, ""));
+            var ponumber = $('#txtPurchasenum').val();
+            var podate = $('#txtPurchasedate').val();
+            var posupplier = $('#txtSupplier').val().trim();
+            var poreqQuantity = $('#txtQuantity').val();
+            var totAvailableQty = $('#txtAvlstock').val();
+            var poLastMonthConsumption = $('#txtMonthConsumption').val();
+            if (!ponumber) {
+                $('#dspPONumber').html("Please Enter Purchase Order Number");
+                $('#txtPurchasenum').focus();
+                return false;
+            } else {
+                $('#dspPONumber').html("")
+            }
+            if (podate == "") {
+                $('#dspPurchaseDate').html("Please Select Purchase Order Date.");
+                $('#txtPurchasedate').focus();
+                return false;
+            } else {
+                $('#dspPurchaseDate').html("")
+            }
+            if (!posupplier) {
+                $('#dspSupplier').html("Please Enter Supplier Name");
+                $('#txtSupplier').focus();
+                return false;
+            } else {
+                $('#dspSupplier').html("")
+            }
+            if (poreqQuantity == '0' || poreqQuantity == " ") {
+                $('#dspQuantity').html("Please Enter Requested Quantity");
+                $('#txtQuantity').focus();
+                return false;
+            } else {
+                $('#dspQuantity').html("")
+            }
+            if (totAvailableQty == '0' || totAvailableQty == " ") {
+                $('#dspAvlStock').html("Please Enter Available Quantity");
+                $('#txtAvlstock').focus();
+                return false;
+            } else {
+                $('#dspAvlStock').html("")
+            }
+            if (poLastMonthConsumption == '0' || poLastMonthConsumption == " ") {
+                $('#dspConsumtion').html("Please, Enter Last Month Consumption");
+                $('#txtMonthConsumption').focus();
+                return false;
+            } else {
+                $('#dspConsumtion').html("")
+            }
+        });
+    });
+
+    $('#txtBoxQuantity').on('input', function () {
+        var hologramtqy = parseInt($(this).val()) || 0; // Use $(this).val() to get the value
+        var formattedQty = hologramtqy * 60000;
+        var formattedQtyString = formattedQty.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        $('#txtQuantity').val(formattedQtyString);
+    });
+
+    function fetchTotalAvailandLastMonthConsumpt() {
+        $.ajax({
+            url: "../PurchaseOrder/GetTotalAvailAndLastMonthConsumpQnty",
+            dataType: 'json',
+            success: function (data) {
+                debugger;
+                var fetchedData = data.data;
+                if (fetchedData.hasOwnProperty('TotalAvailableQuantity')) {
+                    $('#txtAvlstock').val(fetchedData.TotalAvailableQuantity);
+                    $('#txtMonthConsumption').val(fetchedData.LastMonthConsumption);
+
+                } else {
+                    console.error("Property 'TotalAvailableQuantity' And 'LastMonthConsumption' not found in the fetched data.");
+                }
+            },
+            error: function () {
+                console.error("Error fetching data from the API.");
+            }
+        });
+    }
+    function formatDate(dateString) {
+        debugger;
+        var parts = dateString.split('-');
+        var day = parseInt(parts[0], 10);
+        var month = parseInt(parts[1], 10) - 1;
+        var year = parseInt(parts[2], 10);
+        var formattedDate = new Date(year, month, day);
+        var options = { day: '2-digit', month: 'short', year: 'numeric' };
+        return formattedDate.toLocaleDateString('en-IN', options).toUpperCase();
+    }
+</script>
+
